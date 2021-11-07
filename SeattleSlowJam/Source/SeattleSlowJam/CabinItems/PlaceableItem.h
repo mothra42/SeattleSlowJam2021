@@ -16,11 +16,29 @@ public:
 	APlaceableItem();
 
 protected:
+	//Variables
+	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
+	class UStaticMeshComponent* ItemMesh;
+
+	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
+	float RotationAmountDegrees = 90.0f;
+
+	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
+	bool bCanBePlacedOnWall = false;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
+	bool bIsCarried = false;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void RotateRight(bool bRotateRight);
+
+	void AdjustHeight();
+
+	void PlaceItem();
 
 };
