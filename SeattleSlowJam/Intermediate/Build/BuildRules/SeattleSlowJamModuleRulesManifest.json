@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"C:\\Users\\Battlestation One\\Desktop\\Repo\\SeattleSlowJam2021\\SeattleSlowJam\\Source\\SeattleSlowJam\\SeattleSlowJam.Build.cs",
+		"C:\\Users\\Battlestation One\\Desktop\\Repo\\SeattleSlowJam2021\\SeattleSlowJam\\Source\\SeattleSlowJam.Target.cs",
+		"C:\\Users\\Battlestation One\\Desktop\\Repo\\SeattleSlowJam2021\\SeattleSlowJam\\Source\\SeattleSlowJamEditor.Target.cs"
+	],
+	"EngineVersion": "4.27.1"
+}

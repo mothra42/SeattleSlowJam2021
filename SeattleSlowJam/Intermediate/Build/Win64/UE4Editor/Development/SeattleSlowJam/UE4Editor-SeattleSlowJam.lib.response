@@ -1,0 +1,17 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-SeattleSlowJam.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\SeattleSlowJamEditor\Development\Engine\SharedPCH.Engine.ShadowErrors.h.obj"
+"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\CabinCharacter.cpp.obj"
+"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\CabinGameMode.cpp.obj"
+"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\SeattleSlowJam.cpp.obj"
+"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\CabinCharacter.gen.cpp.obj"
+"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\CabinGameMode.gen.cpp.obj"
+"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\SeattleSlowJam.init.gen.cpp.obj"
+"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\Default.rc2.res"
+/OUT:"C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\UE4Editor-SeattleSlowJam.lib"

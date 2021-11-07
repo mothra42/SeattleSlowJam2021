@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "SeattleSlowJam",
+			"Path": "C:\\Users\\Battlestation One\\Desktop\\Repo\\SeattleSlowJam2021\\SeattleSlowJam\\Source\\SeattleSlowJam.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "SeattleSlowJamEditor",
+			"Path": "C:\\Users\\Battlestation One\\Desktop\\Repo\\SeattleSlowJam2021\\SeattleSlowJam\\Source\\SeattleSlowJamEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
