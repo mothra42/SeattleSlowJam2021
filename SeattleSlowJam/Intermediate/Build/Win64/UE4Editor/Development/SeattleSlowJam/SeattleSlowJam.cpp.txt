@@ -1,2 +1,0 @@
-C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Intermediate\Build\Win64\UE4Editor\Development\SeattleSlowJam\Definitions.SeattleSlowJam.h
-C:\Users\Battlestation One\Desktop\Repo\SeattleSlowJam2021\SeattleSlowJam\Source\SeattleSlowJam\SeattleSlowJam.h
