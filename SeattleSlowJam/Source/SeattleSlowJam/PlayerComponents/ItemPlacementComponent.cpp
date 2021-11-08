@@ -1,7 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayerComponents/ItemPlacementComponent.h"
+#include "ItemPlacementComponent.h"
+#include "../CabinItems/PlaceableItem.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values for this component's properties
 UItemPlacementComponent::UItemPlacementComponent()
@@ -28,7 +31,27 @@ void UItemPlacementComponent::BeginPlay()
 void UItemPlacementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	SpawnGhostItem();
 	// ...
+}
+
+void UItemPlacementComponent::SpawnGhostItem()
+{
+	FHitResult Hit;
+	FVector StartLocation = GetOwner()->GetActorLocation();
+	FRotator ActorRotation = GetOwner()->GetActorRotation();
+	FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, DefaultPitchAdjustment);
+	DrawDebugLine(GetWorld(), StartLocation, StartLocation + TraceDirection * LineTraceLength, FColor::Green, false, 5.0f);
+	bool bDidHit = GetWorld()->LineTraceSingleByChannel(Hit, 
+		StartLocation, 
+		StartLocation + TraceDirection * LineTraceLength, 
+		ECollisionChannel::ECC_Camera);
+
+	if (bDidHit && CarriedItem != nullptr)
+	{
+		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.Location, FRotator());
+		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
+		//TODO give the ghost item a transparent material;
+	}
 }
 
