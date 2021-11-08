@@ -71,13 +71,6 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAxis("TurnRate", this, &ACabinCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ACabinCharacter::LookUpAtRate);
-
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ACabinCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ACabinCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ACabinCharacter::OnResetVR);
 }
 
 void ACabinCharacter::TurnAtRate(float Rate)
