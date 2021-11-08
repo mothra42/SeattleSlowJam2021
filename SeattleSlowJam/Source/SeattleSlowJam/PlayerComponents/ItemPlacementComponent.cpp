@@ -31,27 +31,41 @@ void UItemPlacementComponent::BeginPlay()
 void UItemPlacementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	SpawnGhostItem();
-	// ...
+	UpdateGhostItemLocation();
 }
 
-void UItemPlacementComponent::SpawnGhostItem()
+bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
 {
-	FHitResult Hit;
 	FVector StartLocation = GetOwner()->GetActorLocation();
 	FRotator ActorRotation = GetOwner()->GetActorRotation();
 	FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, DefaultPitchAdjustment);
 	DrawDebugLine(GetWorld(), StartLocation, StartLocation + TraceDirection * LineTraceLength, FColor::Green, false, 5.0f);
-	bool bDidHit = GetWorld()->LineTraceSingleByChannel(Hit, 
-		StartLocation, 
-		StartLocation + TraceDirection * LineTraceLength, 
+	//TODO consider changing this to a trace by profile.
+	return GetWorld()->LineTraceSingleByChannel(Hit,
+		StartLocation,
+		StartLocation + TraceDirection * LineTraceLength,
 		ECollisionChannel::ECC_Camera);
+}
 
-	if (bDidHit && CarriedItem != nullptr)
+//This method should only be called when the player first picks up and item;
+void UItemPlacementComponent::SpawnGhostItem()
+{
+	FHitResult Hit;
+
+	if (FindGhostItemPlacementLocation(Hit) && CarriedItem != nullptr)
 	{
 		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.Location, FRotator());
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		//TODO give the ghost item a transparent material;
+	}
+}
+
+void UItemPlacementComponent::UpdateGhostItemLocation()
+{
+	FHitResult Hit;
+	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
+	{
+		GhostItem->SetActorLocation(Hit.Location);
 	}
 }
 

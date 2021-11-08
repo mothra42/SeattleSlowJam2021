@@ -7,6 +7,11 @@
 #include "ItemPlacementComponent.generated.h"
 
 
+//TODO tomorrow add another method that will fire on tick, maybe optimizie this better down the line
+//this function will be similar to spawn ghost item, it just won't spawn the the item.
+//Need one more additional function to place the actual item from the player in the level.
+//Need a method to adjust the line trace angle, but should be reset back after the item is placed.
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SEATTLESLOWJAM_API UItemPlacementComponent : public UActorComponent
 {
@@ -36,6 +41,10 @@ private:
 	class APlaceableItem* CarriedItem;
 
 	APlaceableItem* GhostItem;
+
+	bool FindGhostItemPlacementLocation(FHitResult& Hit);
+
+	void UpdateGhostItemLocation();
 
 // getters and setters
 public:
