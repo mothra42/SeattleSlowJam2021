@@ -49,7 +49,8 @@ ACabinCharacter::ACabinCharacter()
 
 	//ItemPlacement
 	ItemPlacementComponent = CreateDefaultSubobject<UItemPlacementComponent>(TEXT("ItemPlacementComponent"));
-
+	ItemAtachmentComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ItemAttachmentComponent"));
+	ItemAtachmentComponent->SetupAttachment(RootComponent);
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -138,7 +139,8 @@ void ACabinCharacter::PickupItem()
 	if (SweepForPlaceableItem(Hit))
 	{
 		ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
-		//Hit.Actor->SetActorEnableCollision(false);
+		Hit.Actor->SetActorEnableCollision(false);
+		Hit.Actor->AttachToComponent(ItemAtachmentComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		//FVector test = GetMesh()->GetSocketByName(TEXT("PlaceableItemSocket"))->RelativeLocation;
 		//Hit.Actor->AttachToComponent(GetMesh(), 
 		//	FAttachmentTransformRules::SnapToTargetNotIncludingScale, 

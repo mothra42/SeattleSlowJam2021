@@ -21,6 +21,9 @@ class ACabinCharacter : public ACharacter
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
 	class UItemPlacementComponent* ItemPlacementComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
+	class USceneComponent* ItemAtachmentComponent;
 public:
 	ACabinCharacter();
 
