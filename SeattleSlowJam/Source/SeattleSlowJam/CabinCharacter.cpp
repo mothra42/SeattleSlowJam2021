@@ -100,7 +100,7 @@ void ACabinCharacter::LookUpAtRate(float Rate)
 
 void ACabinCharacter::MoveForward(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f) && bIsThirdPersonMode == true)
+	if ((Controller != nullptr) && (Value != 0.0f) && !bIsMovementConstrained)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -191,15 +191,7 @@ void ACabinCharacter::RotateItemLeft()
 
 
 //--------------------------------- Character Mode Switch -------------------------------------------
-void ACabinCharacter::SwitchMovementMode()
+void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 {
-	if (bIsThirdPersonMode)
-	{
-		bIsThirdPersonMode = false;
-
-	}
-	else
-	{
-		bIsThirdPersonMode = true;
-	}
+	bIsMovementConstrained = bShouldConstrainMovement;
 }

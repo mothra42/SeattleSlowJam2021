@@ -36,7 +36,7 @@ public:
 	float BaseLookUpRate;
 
 	UFUNCTION(BlueprintCallable)
-	void SwitchMovementMode();
+	void ShouldConstrainMovement(bool bShouldConstrainMovement);
 
 protected:
 	/** Called for forwards/backward input */
@@ -76,7 +76,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 private:
-	bool bIsThirdPersonMode = true;
+	bool bIsMovementConstrained = false;
 
 public:
 	/** Returns CameraBoom subobject **/
