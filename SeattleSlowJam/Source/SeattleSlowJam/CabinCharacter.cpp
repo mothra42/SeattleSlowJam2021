@@ -100,7 +100,7 @@ void ACabinCharacter::LookUpAtRate(float Rate)
 
 void ACabinCharacter::MoveForward(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value != 0.0f) && bIsThirdPersonMode == true)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -139,6 +139,7 @@ void ACabinCharacter::Interact()
 	}
 }
 
+// --------------------------------------------- Item Placement ------------------------------------------
 void ACabinCharacter::PickupItem()
 {
 	FHitResult Hit;
@@ -186,4 +187,19 @@ void ACabinCharacter::RotateItemRight()
 void ACabinCharacter::RotateItemLeft()
 {
 	ItemPlacementComponent->RotateItem(false);
+}
+
+
+//--------------------------------- Character Mode Switch -------------------------------------------
+void ACabinCharacter::SwitchMovementMode()
+{
+	if (bIsThirdPersonMode)
+	{
+		bIsThirdPersonMode = false;
+
+	}
+	else
+	{
+		bIsThirdPersonMode = true;
+	}
 }
