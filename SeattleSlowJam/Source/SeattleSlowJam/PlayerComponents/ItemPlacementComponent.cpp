@@ -43,7 +43,6 @@ bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
 	FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, DefaultPitchAdjustment);
 	FCollisionObjectQueryParams ObjectParams;
 	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-	DrawDebugLine(GetWorld(), StartLocation, StartLocation + TraceDirection * LineTraceLength, FColor::Green, false, 5.0f);
 	//TODO consider changing this to a trace by profile
 	return GetWorld()->LineTraceSingleByObjectType(Hit,
 		StartLocation,
@@ -58,10 +57,7 @@ void UItemPlacementComponent::SpawnGhostItem()
 
 	if (FindGhostItemPlacementLocation(Hit) && CarriedItem != nullptr)
 	{
-		DrawDebugSphere(GetWorld(), Hit.Location, 10.0f, 8, FColor::Blue, false, 5.0f);
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 8, FColor::Red, false, 5.0f);
-		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, FRotator());
-		//UE_LOG(LogTemp, Warning, TEXT("Static mesh is %s"), *CarriedItem->GetStaticMesh()->GetName());
+		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, FRotator(), FActorSpawnParameters::);
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		GhostItem->SetActorScale3D(CarriedItem->GetActorScale3D());
 		//TODO give the ghost item a transparent material;
@@ -82,10 +78,11 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 void UItemPlacementComponent::FinishPlacingItem()
 {
 	FTransform NewTransform = GhostItem->GetActorTransform();
-	//FVector GhostItem->GetActorLocation();
 	GhostItem->Destroy();
 	GhostItem = nullptr;
 	CarriedItem->SetActorTransform(NewTransform);
+	CarriedItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	CarriedItem->SetActorEnableCollision(true);
 	CarriedItem = nullptr;
 	if (GhostItem == nullptr)
 	{
