@@ -64,7 +64,7 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACabinCharacter::Interact);
+	
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACabinCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACabinCharacter::MoveRight);
@@ -76,6 +76,14 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAxis("TurnRate", this, &ACabinCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ACabinCharacter::LookUpAtRate);
+
+	//ItemPlacement controls
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACabinCharacter::Interact);
+	PlayerInputComponent->BindAction("AdjustAngleUp", IE_Pressed, this, &ACabinCharacter::AdjustPlacementAngleUp);
+	PlayerInputComponent->BindAction("AdjustAngleDown", IE_Pressed, this, &ACabinCharacter::AdjustPlacementAngleDown);
+	PlayerInputComponent->BindAction("RotateRight", IE_Pressed, this, &ACabinCharacter::RotateItemRight);
+	PlayerInputComponent->BindAction("RotateLeft", IE_Pressed, this, &ACabinCharacter::RotateItemLeft);
+
 }
 
 void ACabinCharacter::TurnAtRate(float Rate)
@@ -163,4 +171,24 @@ bool ACabinCharacter::SweepForPlaceableItem(FHitResult& Hit)
 void ACabinCharacter::PlaceItem()
 {
 	ItemPlacementComponent->FinishPlacingItem();
+}
+
+void ACabinCharacter::AdjustPlacementAngleUp()
+{
+	ItemPlacementComponent->AdjustPitchAdjustment(true);
+}
+
+void ACabinCharacter::AdjustPlacementAngleDown()
+{
+	ItemPlacementComponent->AdjustPitchAdjustment(false);
+}
+
+void ACabinCharacter::RotateItemRight()
+{
+	ItemPlacementComponent->RotateItem(true);
+}
+
+void ACabinCharacter::RotateItemLeft()
+{
+	ItemPlacementComponent->RotateItem(false);
 }

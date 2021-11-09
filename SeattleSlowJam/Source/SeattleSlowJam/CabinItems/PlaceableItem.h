@@ -37,7 +37,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void RotateRight(bool bRotateRight);
+	void RotateRight(bool bIsRightRotation);
 
 	void AdjustHeight();
 

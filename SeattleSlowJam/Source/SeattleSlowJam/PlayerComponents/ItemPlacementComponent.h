@@ -32,9 +32,18 @@ public:
 
 	void FinishPlacingItem();
 
+	void AdjustPitchAdjustment(bool bIsAdjustingUp);
+
+	void RotateItem(bool bIsRightRotation);
+
 private:
 	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float LineTraceLength = 150.0f;
+
+	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float LineTracePitchAdjustmentAmount = 15.0f;
+
+	float PitchAdjustment;
 
 	class APlaceableItem* CarriedItem = nullptr;
 

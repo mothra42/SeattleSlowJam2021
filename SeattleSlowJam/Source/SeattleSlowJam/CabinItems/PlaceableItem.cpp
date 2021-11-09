@@ -30,10 +30,10 @@ void APlaceableItem::Tick(float DeltaTime)
 
 }
 
-void APlaceableItem::RotateRight(bool bRotateRight)
+void APlaceableItem::RotateRight(bool bIsRightRotation)
 {
 	FRotator NewObjectRotation;
-	if (bRotateRight)
+	if (bIsRightRotation)
 	{
 		//rotate item to the right by 90 degrees
 		NewObjectRotation = GetActorRotation() + FRotator(0.0f, RotationAmountDegrees, 0.0f);

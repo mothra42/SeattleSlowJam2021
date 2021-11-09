@@ -60,6 +60,11 @@ protected:
 
 	void PlaceItem();
 
+	void AdjustPlacementAngleUp();
+	void AdjustPlacementAngleDown();
+	void RotateItemRight();
+	void RotateItemLeft();
+
 private:
 	bool SweepForPlaceableItem(FHitResult& Hit);
 

@@ -12,6 +12,7 @@ UItemPlacementComponent::UItemPlacementComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	PitchAdjustment = DefaultPitchAdjustment;
 	// ...
 }
 
@@ -40,7 +41,7 @@ bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
 {
 	FVector StartLocation = GetOwner()->GetActorLocation();
 	FRotator ActorRotation = GetOwner()->GetActorRotation();
-	FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, DefaultPitchAdjustment);
+	FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, PitchAdjustment);
 	FCollisionObjectQueryParams ObjectParams;
 	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 	//TODO consider changing this to a trace by profile
@@ -57,7 +58,7 @@ void UItemPlacementComponent::SpawnGhostItem()
 
 	if (FindGhostItemPlacementLocation(Hit) && CarriedItem != nullptr)
 	{
-		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, FRotator(), FActorSpawnParameters::);
+		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, FRotator());
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		GhostItem->SetActorScale3D(CarriedItem->GetActorScale3D());
 		//TODO give the ghost item a transparent material;
@@ -84,9 +85,29 @@ void UItemPlacementComponent::FinishPlacingItem()
 	CarriedItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	CarriedItem->SetActorEnableCollision(true);
 	CarriedItem = nullptr;
-	if (GhostItem == nullptr)
+	PitchAdjustment = DefaultPitchAdjustment;
+}
+
+void UItemPlacementComponent::AdjustPitchAdjustment(bool bIsAdjustingUp)
+{
+	if (CarriedItem != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("That worked"));
+		//TODO Clamp these values.
+		if (bIsAdjustingUp)
+		{
+			PitchAdjustment += LineTracePitchAdjustmentAmount;
+		}
+		else
+		{
+			PitchAdjustment -= LineTracePitchAdjustmentAmount;
+		}
 	}
 }
 
+void UItemPlacementComponent::RotateItem(bool bIsRightRotation)
+{
+	if (CarriedItem != nullptr && GhostItem != nullptr)
+	{
+		GhostItem->RotateRight(bIsRightRotation);
+	}
+}
