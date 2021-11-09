@@ -35,6 +35,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UFUNCTION(BlueprintCallable)
+	void SwitchMovementMode();
+
 protected:
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -72,6 +75,8 @@ protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+private:
+	bool bIsThirdPersonMode = true;
 
 public:
 	/** Returns CameraBoom subobject **/
