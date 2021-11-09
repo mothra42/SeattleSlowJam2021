@@ -149,11 +149,6 @@ void ACabinCharacter::PickupItem()
 		ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
 		Hit.Actor->SetActorEnableCollision(false);
 		Hit.Actor->AttachToComponent(ItemAtachmentComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		//FVector test = GetMesh()->GetSocketByName(TEXT("PlaceableItemSocket"))->RelativeLocation;
-		//Hit.Actor->AttachToComponent(GetMesh(), 
-		//	FAttachmentTransformRules::SnapToTargetNotIncludingScale, 
-		//	TEXT("PlaceableItemSocket")
-		//);
 		ItemPlacementComponent->SpawnGhostItem();
 	}
 	
@@ -165,7 +160,7 @@ bool ACabinCharacter::SweepForPlaceableItem(FHitResult& Hit)
 	FVector TraceEnd = GetActorLocation() + FVector::DownVector * 75.01f;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = { EObjectTypeQuery::ObjectTypeQuery7 };
 	return UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), TraceBegin, TraceEnd,
-		75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, Hit, true);
+		75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
 }
 
 void ACabinCharacter::PlaceItem()

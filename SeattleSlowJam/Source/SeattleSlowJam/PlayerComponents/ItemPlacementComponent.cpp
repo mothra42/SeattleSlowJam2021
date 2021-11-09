@@ -71,8 +71,6 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
 	{
 		GhostItem->SetActorLocation(Hit.Location);
-		DrawDebugSphere(GetWorld(), Hit.Location, 10.0f, 8, FColor::Blue, false, 5.0f);
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 8, FColor::Red, false, 5.0f);
 	}
 }
 
