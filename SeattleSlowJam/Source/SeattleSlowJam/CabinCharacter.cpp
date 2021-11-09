@@ -8,6 +8,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "PlayerComponents/ItemPlacementComponent.h"
+#include "CabinItems/PlaceableItem.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACabinCharacter
@@ -43,6 +47,10 @@ ACabinCharacter::ACabinCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	//ItemPlacement
+	ItemPlacementComponent = CreateDefaultSubobject<UItemPlacementComponent>(TEXT("ItemPlacementComponent"));
+	ItemAtachmentComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ItemAttachmentComponent"));
+	ItemAtachmentComponent->SetupAttachment(RootComponent);
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -56,6 +64,7 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACabinCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACabinCharacter::MoveRight);
@@ -68,34 +77,13 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ACabinCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ACabinCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ACabinCharacter::TouchStopped);
+	//ItemPlacement controls
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACabinCharacter::Interact);
+	PlayerInputComponent->BindAction("AdjustAngleUp", IE_Pressed, this, &ACabinCharacter::AdjustPlacementAngleUp);
+	PlayerInputComponent->BindAction("AdjustAngleDown", IE_Pressed, this, &ACabinCharacter::AdjustPlacementAngleDown);
+	PlayerInputComponent->BindAction("RotateRight", IE_Pressed, this, &ACabinCharacter::RotateItemRight);
+	PlayerInputComponent->BindAction("RotateLeft", IE_Pressed, this, &ACabinCharacter::RotateItemLeft);
 
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ACabinCharacter::OnResetVR);
-}
-
-
-void ACabinCharacter::OnResetVR()
-{
-	// If SeattleSlowJam is added to a project via 'Add Feature' in the Unreal Editor the dependency on HeadMountedDisplay in SeattleSlowJam.Build.cs is not automatically propagated
-	// and a linker error will result.
-	// You will need to either:
-	//		Add "HeadMountedDisplay" to [YourProject].Build.cs PublicDependencyModuleNames in order to build successfully (appropriate if supporting VR).
-	// or:
-	//		Comment or delete the call to ResetOrientationAndPosition below (appropriate if not supporting VR)
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-
-void ACabinCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		Jump();
-}
-
-void ACabinCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		StopJumping();
 }
 
 void ACabinCharacter::TurnAtRate(float Rate)
@@ -137,4 +125,65 @@ void ACabinCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ACabinCharacter::Interact()
+{
+	if (ItemPlacementComponent->GetCarriedItem() != nullptr)
+	{
+		PlaceItem();
+	}
+	else
+	{
+		PickupItem();
+	}
+}
+
+void ACabinCharacter::PickupItem()
+{
+	FHitResult Hit;
+	//TODO for now should just make a slot on the skeletal mesh and attach the item to it.
+	//also handle calling methods in ItemPlacementComponent	
+	if (SweepForPlaceableItem(Hit))
+	{
+		ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
+		Hit.Actor->SetActorEnableCollision(false);
+		Hit.Actor->AttachToComponent(ItemAtachmentComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		ItemPlacementComponent->SpawnGhostItem();
+	}
+	
+}
+
+bool ACabinCharacter::SweepForPlaceableItem(FHitResult& Hit)
+{
+	FVector TraceBegin = GetActorLocation() + FVector::DownVector * 75.0f;
+	FVector TraceEnd = GetActorLocation() + FVector::DownVector * 75.01f;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = { EObjectTypeQuery::ObjectTypeQuery7 };
+	return UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), TraceBegin, TraceEnd,
+		75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
+}
+
+void ACabinCharacter::PlaceItem()
+{
+	ItemPlacementComponent->FinishPlacingItem();
+}
+
+void ACabinCharacter::AdjustPlacementAngleUp()
+{
+	ItemPlacementComponent->AdjustPitchAdjustment(true);
+}
+
+void ACabinCharacter::AdjustPlacementAngleDown()
+{
+	ItemPlacementComponent->AdjustPitchAdjustment(false);
+}
+
+void ACabinCharacter::RotateItemRight()
+{
+	ItemPlacementComponent->RotateItem(true);
+}
+
+void ACabinCharacter::RotateItemLeft()
+{
+	ItemPlacementComponent->RotateItem(false);
 }

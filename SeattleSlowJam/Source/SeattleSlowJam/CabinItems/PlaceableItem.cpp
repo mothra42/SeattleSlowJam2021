@@ -3,13 +3,17 @@
 
 #include "PlaceableItem.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 
 // Sets default values
 APlaceableItem::APlaceableItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
+	ItemMesh->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -26,10 +30,10 @@ void APlaceableItem::Tick(float DeltaTime)
 
 }
 
-void APlaceableItem::RotateRight(bool bRotateRight)
+void APlaceableItem::RotateRight(bool bIsRightRotation)
 {
 	FRotator NewObjectRotation;
-	if (bRotateRight)
+	if (bIsRightRotation)
 	{
 		//rotate item to the right by 90 degrees
 		NewObjectRotation = GetActorRotation() + FRotator(0.0f, RotationAmountDegrees, 0.0f);

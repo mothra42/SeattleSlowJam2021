@@ -17,6 +17,8 @@ public:
 
 protected:
 	//Variables
+	class USceneComponent* Root;
+
 	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
 	class UStaticMeshComponent* ItemMesh;
 
@@ -35,10 +37,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void RotateRight(bool bRotateRight);
+	void RotateRight(bool bIsRightRotation);
 
 	void AdjustHeight();
 
 	void PlaceItem();
+
+	FORCEINLINE UStaticMeshComponent* GetStaticMesh() const { return ItemMesh; }
+	FORCEINLINE void SetItemStaticMesh(UStaticMeshComponent* ItemMeshToSet) { ItemMesh->SetStaticMesh(ItemMeshToSet->GetStaticMesh()); }
 
 };

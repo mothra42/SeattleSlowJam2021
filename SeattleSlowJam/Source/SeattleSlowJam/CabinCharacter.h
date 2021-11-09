@@ -18,6 +18,12 @@ class ACabinCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
+	class UItemPlacementComponent* ItemPlacementComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
+	class USceneComponent* ItemAtachmentComponent;
 public:
 	ACabinCharacter();
 
@@ -30,10 +36,6 @@ public:
 	float BaseLookUpRate;
 
 protected:
-
-	/** Resets HMD orientation in VR. */
-	void OnResetVR();
-
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
@@ -52,11 +54,19 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
+	void Interact();
 
-	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+	void PickupItem();
+
+	void PlaceItem();
+
+	void AdjustPlacementAngleUp();
+	void AdjustPlacementAngleDown();
+	void RotateItemRight();
+	void RotateItemLeft();
+
+private:
+	bool SweepForPlaceableItem(FHitResult& Hit);
 
 protected:
 	// APawn interface
