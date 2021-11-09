@@ -51,6 +51,15 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
+	void Interact();
+
+	void PickupItem();
+
+	void PlaceItem();
+
+private:
+	bool SweepForPlaceableItem(FHitResult& Hit);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

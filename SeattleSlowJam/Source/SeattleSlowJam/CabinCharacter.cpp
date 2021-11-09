@@ -9,6 +9,9 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "PlayerComponents/ItemPlacementComponent.h"
+#include "CabinItems/PlaceableItem.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACabinCharacter
@@ -60,6 +63,7 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACabinCharacter::Interact);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACabinCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACabinCharacter::MoveRight);
@@ -112,4 +116,49 @@ void ACabinCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ACabinCharacter::Interact()
+{
+	if (ItemPlacementComponent->GetCarriedItem() != nullptr)
+	{
+		PlaceItem();
+	}
+	else
+	{
+		PickupItem();
+	}
+}
+
+void ACabinCharacter::PickupItem()
+{
+	FHitResult Hit;
+	//TODO for now should just make a slot on the skeletal mesh and attach the item to it.
+	//also handle calling methods in ItemPlacementComponent	
+	if (SweepForPlaceableItem(Hit))
+	{
+		ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
+		//Hit.Actor->SetActorEnableCollision(false);
+		//FVector test = GetMesh()->GetSocketByName(TEXT("PlaceableItemSocket"))->RelativeLocation;
+		//Hit.Actor->AttachToComponent(GetMesh(), 
+		//	FAttachmentTransformRules::SnapToTargetNotIncludingScale, 
+		//	TEXT("PlaceableItemSocket")
+		//);
+		ItemPlacementComponent->SpawnGhostItem();
+	}
+	
+}
+
+bool ACabinCharacter::SweepForPlaceableItem(FHitResult& Hit)
+{
+	FVector TraceBegin = GetActorLocation() + FVector::DownVector * 75.0f;
+	FVector TraceEnd = GetActorLocation() + FVector::DownVector * 75.01f;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = { EObjectTypeQuery::ObjectTypeQuery7 };
+	return UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), TraceBegin, TraceEnd,
+		75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, Hit, true);
+}
+
+void ACabinCharacter::PlaceItem()
+{
+	ItemPlacementComponent->FinishPlacingItem();
 }
