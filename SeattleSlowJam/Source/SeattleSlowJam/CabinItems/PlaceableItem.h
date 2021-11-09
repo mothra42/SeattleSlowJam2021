@@ -44,6 +44,6 @@ public:
 	void PlaceItem();
 
 	FORCEINLINE UStaticMeshComponent* GetStaticMesh() const { return ItemMesh; }
-	FORCEINLINE void SetItemStaticMesh(UStaticMeshComponent* ItemMeshToSet) { ItemMesh = ItemMeshToSet; }
+	FORCEINLINE void SetItemStaticMesh(UStaticMeshComponent* ItemMeshToSet) { ItemMesh->SetStaticMesh(ItemMeshToSet->GetStaticMesh()); }
 
 };
