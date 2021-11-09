@@ -17,6 +17,8 @@ public:
 
 protected:
 	//Variables
+	class USceneComponent* Root;
+
 	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
 	class UStaticMeshComponent* ItemMesh;
 

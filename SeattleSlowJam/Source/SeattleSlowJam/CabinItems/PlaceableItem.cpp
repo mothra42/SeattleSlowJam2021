@@ -3,12 +3,15 @@
 
 #include "PlaceableItem.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 
 // Sets default values
 APlaceableItem::APlaceableItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
 	ItemMesh->SetupAttachment(RootComponent);
 }
