@@ -60,7 +60,7 @@ void UItemPlacementComponent::SpawnGhostItem()
 	{
 		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, FRotator());
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
-		GhostItem->SetActorScale3D(CarriedItem->GetActorScale3D());
+		GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
 		//TODO give the ghost item a transparent material;
 	}
 }
@@ -79,6 +79,7 @@ void UItemPlacementComponent::FinishPlacingItem()
 	FTransform NewTransform = GhostItem->GetActorTransform();
 	GhostItem->Destroy();
 	GhostItem = nullptr;
+	NewTransform.SetScale3D(FVector(1.0, 1.0, 1.0));
 	CarriedItem->SetActorTransform(NewTransform);
 	CarriedItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	CarriedItem->SetActorEnableCollision(true);
