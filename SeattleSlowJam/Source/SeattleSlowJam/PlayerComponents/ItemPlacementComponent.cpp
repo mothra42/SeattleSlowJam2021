@@ -72,6 +72,14 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 	{
 		GhostItem->SetActorLocation(Hit.Location);
 	}
+	else
+	{
+		//If There is no hit change location to where the trace ends
+		//TODO Apply a color that makes it clear it's an invalid placement.
+		FRotator ActorRotation = GetOwner()->GetActorRotation();
+		FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, PitchAdjustment);
+		GhostItem->SetActorLocation(GetOwner()->GetActorLocation() + TraceDirection * LineTraceLength);
+	}
 }
 
 void UItemPlacementComponent::FinishPlacingItem()
