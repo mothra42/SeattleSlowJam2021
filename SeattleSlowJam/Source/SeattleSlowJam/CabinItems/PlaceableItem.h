@@ -19,7 +19,7 @@ protected:
 	//Variables
 	class USceneComponent* Root;
 
-	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
+	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly, BlueprintReadOnly)
 	class UStaticMeshComponent* ItemMesh;
 
 	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
