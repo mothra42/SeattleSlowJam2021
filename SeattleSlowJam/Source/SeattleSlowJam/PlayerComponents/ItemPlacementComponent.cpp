@@ -59,6 +59,7 @@ void UItemPlacementComponent::SpawnGhostItem()
 	if (FindGhostItemPlacementLocation(Hit) && CarriedItem != nullptr)
 	{
 		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, FRotator());
+		GhostItem->SetActorEnableCollision(false);
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
 		//TODO give the ghost item a transparent material;
