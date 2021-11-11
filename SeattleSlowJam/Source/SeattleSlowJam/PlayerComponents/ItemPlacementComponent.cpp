@@ -14,7 +14,6 @@ UItemPlacementComponent::UItemPlacementComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	PitchAdjustment = DefaultPitchAdjustment;
 	// ...
 }
 
@@ -37,8 +36,6 @@ void UItemPlacementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	{
 		UpdateGhostItemLocation();
 	}
-	//FHitResult Hit;
-	//FindGhostItemPlacementLocation(Hit);
 }
 
 bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
@@ -62,7 +59,8 @@ void UItemPlacementComponent::SpawnGhostItem()
 
 	if (FindGhostItemPlacementLocation(Hit) && CarriedItem != nullptr)
 	{
-		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, FRotator());
+		FRotator CarriedItemRotation = CarriedItem->GetActorRotation();
+		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, CarriedItemRotation);
 		GhostItem->GetStaticMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
@@ -105,10 +103,10 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 	else
 	{
 		//TODO Apply a color that makes it clear it's an invalid placement.
-		FRotator ActorRotation = GetOwner()->GetActorRotation();
-		FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, PitchAdjustment);
-		bDidActorMove = GhostItem->SetActorLocation(GetOwner()->GetActorLocation() + TraceDirection * LineTraceLength, true, &SweepHit, ETeleportType::None);
-		DrawDebugSphere(GetWorld(), SweepHit.Location, 10.0f, 8, FColor::Blue, false, 5.0f);
+		ACabinCharacter* PlayerCharacter = Cast<ACabinCharacter>(GetOwner());
+		FVector StartLocation = PlayerCharacter->GetFollowCamera()->GetComponentLocation();
+		FVector EndLocation = StartLocation + PlayerCharacter->GetFollowCamera()->GetForwardVector() * LineTraceLength;
+		bDidActorMove = GhostItem->SetActorLocation(EndLocation, true, &SweepHit, ETeleportType::None);
 		if (SweepHit.Actor != nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Hit is at %s"), *SweepHit.Actor->GetName());
@@ -150,23 +148,6 @@ void UItemPlacementComponent::FinishPlacingItem()
 	CarriedItem->SetActorHiddenInGame(false);
 	CarriedItem->SetActorEnableCollision(true);
 	CarriedItem = nullptr;
-	PitchAdjustment = DefaultPitchAdjustment;
-}
-
-void UItemPlacementComponent::AdjustPitchAdjustment(bool bIsAdjustingUp)
-{
-	if (CarriedItem != nullptr)
-	{
-		//TODO Clamp these values.
-		if (bIsAdjustingUp)
-		{
-			PitchAdjustment += LineTracePitchAdjustmentAmount;
-		}
-		else
-		{
-			PitchAdjustment -= LineTracePitchAdjustmentAmount;
-		}
-	}
 }
 
 void UItemPlacementComponent::RotateItem(bool bIsRightRotation)
