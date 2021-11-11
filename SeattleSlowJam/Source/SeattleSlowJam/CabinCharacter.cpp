@@ -149,7 +149,7 @@ void ACabinCharacter::PickupItem()
 	{
 		ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
 		Hit.Actor->SetActorEnableCollision(false);
-		Hit.Actor->AttachToComponent(ItemAtachmentComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		Hit.Actor->SetActorHiddenInGame(true);
 		ItemPlacementComponent->SpawnGhostItem();
 	}
 	

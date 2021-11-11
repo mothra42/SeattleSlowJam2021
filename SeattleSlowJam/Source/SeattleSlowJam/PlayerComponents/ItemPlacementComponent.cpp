@@ -94,7 +94,7 @@ void UItemPlacementComponent::FinishPlacingItem()
 	GhostItem = nullptr;
 	NewTransform.SetScale3D(FVector(1.0, 1.0, 1.0));
 	CarriedItem->SetActorTransform(NewTransform);
-	CarriedItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	CarriedItem->SetActorHiddenInGame(false);
 	CarriedItem->SetActorEnableCollision(true);
 	CarriedItem = nullptr;
 	PitchAdjustment = DefaultPitchAdjustment;
