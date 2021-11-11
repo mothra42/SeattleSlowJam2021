@@ -51,6 +51,9 @@ protected:
 	 */
 	void TurnAtRate(float Rate);
 
+	virtual void AddControllerYawInput(float Value) override;
+	virtual void AddControllerPitchInput(float Value) override;
+
 	/**
 	 * Called via input to turn look up/down at a given rate. 
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
@@ -63,13 +66,25 @@ protected:
 
 	void PlaceItem();
 
-	void AdjustPlacementAngleUp();
-	void AdjustPlacementAngleDown();
-	void RotateItemRight();
-	void RotateItemLeft();
+	void RotateItem(float Value);
 
 private:
+	bool bIsItemAdjustmentMode = false;
+
 	bool SweepForPlaceableItem(FHitResult& Hit);
+
+	bool bCanRotateItem = true;
+
+	FTimerHandle TimerHandle_RotateItemTimerExpired;
+
+	void EnterItemAdjustmentMode();
+
+	void ExitItemAdjustmentMode();
+
+	void RotateTimerExpired();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
+	float RotationRate = 0.3f;
 
 protected:
 	// APawn interface
