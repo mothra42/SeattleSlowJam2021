@@ -35,11 +35,15 @@ void UItemPlacementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	{
 		UpdateGhostItemLocation();
 	}
+	//FHitResult Hit;
+	//FindGhostItemPlacementLocation(Hit);
 }
 
 bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
 {
-	FVector StartLocation = GetOwner()->GetActorLocation();
+	ACabinCharacter* PlayerCharacter = Cast<ACabinCharacter>(GetOwner());
+	FVector StartLocation = PlayerCharacter->GetFollowCamera()->GetComponentLocation();
+	FVector EndLocation = StartLocation + PlayerCharacter->GetFollowCamera()->GetForwardVector() * LineTraceLength;
 	FRotator ActorRotation = GetOwner()->GetActorRotation();
 	FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, PitchAdjustment);
 	FCollisionObjectQueryParams ObjectParams;
@@ -47,7 +51,7 @@ bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
 	//TODO consider changing this to a trace by profile
 	return GetWorld()->LineTraceSingleByObjectType(Hit,
 		StartLocation,
-		StartLocation + TraceDirection * LineTraceLength,
+		EndLocation,
 		ObjectParams);
 }
 
