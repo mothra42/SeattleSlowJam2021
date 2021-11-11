@@ -38,7 +38,7 @@ public:
 
 private:
 	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float LineTraceLength = 150.0f;
+	float LineTraceLength = 1000.0f;
 
 	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float LineTracePitchAdjustmentAmount = 15.0f;

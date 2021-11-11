@@ -3,6 +3,8 @@
 
 #include "ItemPlacementComponent.h"
 #include "../CabinItems/PlaceableItem.h"
+#include "Camera/CameraComponent.h"
+#include "../CabinCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -44,11 +46,9 @@ bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
 	ACabinCharacter* PlayerCharacter = Cast<ACabinCharacter>(GetOwner());
 	FVector StartLocation = PlayerCharacter->GetFollowCamera()->GetComponentLocation();
 	FVector EndLocation = StartLocation + PlayerCharacter->GetFollowCamera()->GetForwardVector() * LineTraceLength;
-	FRotator ActorRotation = GetOwner()->GetActorRotation();
-	FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, PitchAdjustment);
 	FCollisionObjectQueryParams ObjectParams;
 	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-	//TODO consider changing this to a trace by profile
+	//MAYBE consider changing this to a trace by profile
 	return GetWorld()->LineTraceSingleByObjectType(Hit,
 		StartLocation,
 		EndLocation,
@@ -63,7 +63,7 @@ void UItemPlacementComponent::SpawnGhostItem()
 	if (FindGhostItemPlacementLocation(Hit) && CarriedItem != nullptr)
 	{
 		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, FRotator());
-		GhostItem->SetActorEnableCollision(false);
+		GhostItem->GetStaticMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
 		//TODO give the ghost item a transparent material;
@@ -73,17 +73,70 @@ void UItemPlacementComponent::SpawnGhostItem()
 void UItemPlacementComponent::UpdateGhostItemLocation()
 {
 	FHitResult Hit;
+	FHitResult SweepHit;
+	bool bDidActorMove;
 	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
 	{
-		GhostItem->SetActorLocation(Hit.Location);
+		bDidActorMove = GhostItem->SetActorLocation(Hit.Location, true, &SweepHit, ETeleportType::None);
+		//if (!bDidActorMove)
+		//{
+		//	//TODO do some checks to see which Coordinates need to be preserved
+		//	FVector ComparisonVector = (GhostItem->GetActorLocation() - SweepHit.ImpactPoint).GetAbs();
+		//	if (ComparisonVector.X > 0.0001)
+		//	{
+		//		FVector MoveToLocation = FVector(GhostItem->GetActorLocation().X, Hit.Location.Y, Hit.Location.Z);
+		//		UE_LOG(LogTemp, Warning, TEXT("Keep X the same"));
+		//		GhostItem->SetActorLocation(MoveToLocation);
+		//	}
+		//	else if (ComparisonVector.Y > 0.0001)
+		//	{
+		//		FVector MoveToLocation = FVector(Hit.Location.X, GhostItem->GetActorLocation().Y, Hit.Location.Z);
+		//		UE_LOG(LogTemp, Warning, TEXT("Keep Y the same"));
+		//		GhostItem->SetActorLocation(MoveToLocation);
+		//	}
+		//	else
+		//	{
+		//		FVector MoveToLocation = FVector(Hit.Location.X, Hit.Location.Y, GhostItem->GetActorLocation().Z);
+		//		UE_LOG(LogTemp, Warning, TEXT("Keep Z the same"));
+		//		GhostItem->SetActorLocation(MoveToLocation);
+		//	}
+		//}
 	}
 	else
 	{
-		//If There is no hit change location to where the trace ends
 		//TODO Apply a color that makes it clear it's an invalid placement.
 		FRotator ActorRotation = GetOwner()->GetActorRotation();
 		FVector TraceDirection = UKismetMathLibrary::CreateVectorFromYawPitch(ActorRotation.Yaw, PitchAdjustment);
-		GhostItem->SetActorLocation(GetOwner()->GetActorLocation() + TraceDirection * LineTraceLength);
+		bDidActorMove = GhostItem->SetActorLocation(GetOwner()->GetActorLocation() + TraceDirection * LineTraceLength, true, &SweepHit, ETeleportType::None);
+		DrawDebugSphere(GetWorld(), SweepHit.Location, 10.0f, 8, FColor::Blue, false, 5.0f);
+		if (SweepHit.Actor != nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hit is at %s"), *SweepHit.Actor->GetName());
+
+			//if (!bDidActorMove)
+			//{
+			//	//TODO do some checks to see which Coordinates need to be preserved
+			//	FVector ComparisonVector = (GhostItem->GetActorLocation() - SweepHit.ImpactPoint).GetAbs();
+			//	if (ComparisonVector.X > 0.0001)
+			//	{
+			//		FVector MoveToLocation = FVector(GhostItem->GetActorLocation().X, Hit.Location.Y, Hit.Location.Z);
+			//		UE_LOG(LogTemp, Warning, TEXT("Keep X the same"));
+			//		GhostItem->SetActorLocation(MoveToLocation);
+			//	}
+			//	else if (ComparisonVector.Y > 0.0001)
+			//	{
+			//		FVector MoveToLocation = FVector(Hit.Location.X, GhostItem->GetActorLocation().Y, Hit.Location.Z);
+			//		UE_LOG(LogTemp, Warning, TEXT("Keep Y the same"));
+			//		GhostItem->SetActorLocation(MoveToLocation);
+			//	}
+			//	else
+			//	{
+			//		FVector MoveToLocation = FVector(Hit.Location.X, Hit.Location.Y, GhostItem->GetActorLocation().Z);
+			//		UE_LOG(LogTemp, Warning, TEXT("Keep Z the same"));
+			//		GhostItem->SetActorLocation(MoveToLocation);
+			//	}
+			//}
+		}
 	}
 }
 
