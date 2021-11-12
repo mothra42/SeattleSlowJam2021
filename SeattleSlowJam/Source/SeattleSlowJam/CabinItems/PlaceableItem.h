@@ -19,11 +19,11 @@ protected:
 	//Variables
 	class USceneComponent* Root;
 
-	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
+	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly, BlueprintReadOnly)
 	class UStaticMeshComponent* ItemMesh;
 
 	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
-	float RotationAmountDegrees = 90.0f;
+	float RotationAmountDegrees = 15.0f;
 
 	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
 	bool bCanBePlacedOnWall = false;

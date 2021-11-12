@@ -64,7 +64,6 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACabinCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACabinCharacter::MoveRight);
@@ -72,30 +71,66 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Turn", this, &ACabinCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &ACabinCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &ACabinCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ACabinCharacter::LookUpAtRate);
 
 	//ItemPlacement controls
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACabinCharacter::Interact);
-	PlayerInputComponent->BindAction("AdjustAngleUp", IE_Pressed, this, &ACabinCharacter::AdjustPlacementAngleUp);
-	PlayerInputComponent->BindAction("AdjustAngleDown", IE_Pressed, this, &ACabinCharacter::AdjustPlacementAngleDown);
-	PlayerInputComponent->BindAction("RotateRight", IE_Pressed, this, &ACabinCharacter::RotateItemRight);
-	PlayerInputComponent->BindAction("RotateLeft", IE_Pressed, this, &ACabinCharacter::RotateItemLeft);
+	PlayerInputComponent->BindAction("EnterItemAdjustmentMode", IE_Pressed, this, &ACabinCharacter::EnterItemAdjustmentMode);
+	PlayerInputComponent->BindAction("EnterItemAdjustmentMode", IE_Released, this, &ACabinCharacter::ExitItemAdjustmentMode);
+	PlayerInputComponent->BindAxis("RotateRight", this, &ACabinCharacter::RotateItem);
+	PlayerInputComponent->BindAxis("AdjustLineTraceLength", this, &ACabinCharacter::AdjustItemLineTraceLength);
 
+
+}
+
+void ACabinCharacter::AddControllerYawInput(float Value)
+{
+	//regular controls
+	if (!bIsItemAdjustmentMode)
+	{
+		Super::AddControllerYawInput(Value);
+	}
+	else
+	{
+		//rotate item here
+		RotateItem(Value);
+	}
 }
 
 void ACabinCharacter::TurnAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	//regular controls
+	if (!bIsItemAdjustmentMode)
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	}
+	else
+	{
+		//rotate item here
+		RotateItem(Rate);
+	}
+}
+
+void ACabinCharacter::AddControllerPitchInput(float Value)
+{
+	//regular controls
+	if (!bIsItemAdjustmentMode)
+	{
+		Super::AddControllerPitchInput(Value);
+	}
 }
 
 void ACabinCharacter::LookUpAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	if (!bIsItemAdjustmentMode)
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	}
 }
 
 void ACabinCharacter::MoveForward(float Value)
@@ -147,12 +182,15 @@ void ACabinCharacter::PickupItem()
 	//also handle calling methods in ItemPlacementComponent	
 	if (SweepForPlaceableItem(Hit))
 	{
-		ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
-		Hit.Actor->SetActorEnableCollision(false);
-		Hit.Actor->AttachToComponent(ItemAtachmentComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		ItemPlacementComponent->SpawnGhostItem();
+		APlaceableItem* ItemToCarry = Cast<APlaceableItem>(Hit.Actor);
+		if (ItemToCarry != nullptr)
+		{
+			ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
+			ItemToCarry->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+			ItemToCarry->SetActorHiddenInGame(true);
+			ItemPlacementComponent->SpawnGhostItem();
+		}
 	}
-	
 }
 
 bool ACabinCharacter::SweepForPlaceableItem(FHitResult& Hit)
@@ -169,26 +207,46 @@ void ACabinCharacter::PlaceItem()
 	ItemPlacementComponent->FinishPlacingItem();
 }
 
-void ACabinCharacter::AdjustPlacementAngleUp()
+void ACabinCharacter::EnterItemAdjustmentMode()
 {
-	ItemPlacementComponent->AdjustPitchAdjustment(true);
+	if (ItemPlacementComponent->GetCarriedItem() != nullptr)
+	{
+		bIsItemAdjustmentMode = true;
+	}
 }
 
-void ACabinCharacter::AdjustPlacementAngleDown()
+void ACabinCharacter::ExitItemAdjustmentMode()
 {
-	ItemPlacementComponent->AdjustPitchAdjustment(false);
+	bIsItemAdjustmentMode = false;
 }
 
-void ACabinCharacter::RotateItemRight()
+void ACabinCharacter::RotateItem(float Value)
 {
-	ItemPlacementComponent->RotateItem(true);
+	if (bCanRotateItem && Value != 0.0f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_RotateItemTimerExpired, 
+			this, 
+			&ACabinCharacter::RotateTimerExpired, RotationRate
+		);
+
+		bCanRotateItem = false;
+		ItemPlacementComponent->RotateItem(Value > 0.0f);
+	}
 }
 
-void ACabinCharacter::RotateItemLeft()
+void ACabinCharacter::RotateTimerExpired()
 {
-	ItemPlacementComponent->RotateItem(false);
+	bCanRotateItem = true;
 }
 
+void ACabinCharacter::AdjustItemLineTraceLength(float Value)
+{
+	if (Value != 0.0f)
+	{
+		ItemPlacementComponent->AdjustLineTraceLength(Value > 0.0f);
+	}
+}
 
 //--------------------------------- Character Mode Switch -------------------------------------------
 void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)

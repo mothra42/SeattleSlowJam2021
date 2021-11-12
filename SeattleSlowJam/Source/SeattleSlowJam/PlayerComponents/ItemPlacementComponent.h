@@ -17,9 +17,6 @@ public:
 	// Sets default values for this component's properties
 	UItemPlacementComponent();
 
-	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly)
-	float DefaultPitchAdjustment = -45.0f;
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -32,18 +29,17 @@ public:
 
 	void FinishPlacingItem();
 
-	void AdjustPitchAdjustment(bool bIsAdjustingUp);
-
 	void RotateItem(bool bIsRightRotation);
+
+	void AdjustLineTraceLength(bool bShouldIncrease);
 
 private:
 	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float LineTraceLength = 150.0f;
+	float DefaultLineTraceLength = 1000.0f;
+	
+	float LineTraceLength;
 
-	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float LineTracePitchAdjustmentAmount = 15.0f;
-
-	float PitchAdjustment;
+	float LineTraceAdjustmentAmount = 10.0f;
 
 	class APlaceableItem* CarriedItem = nullptr;
 
