@@ -56,12 +56,14 @@ bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
 void UItemPlacementComponent::SpawnGhostItem()
 {
 	FHitResult Hit;
-
+	LineTraceLength = FMath::Clamp(DefaultLineTraceLength, 650.0f, 1500.0f); //not working, maybe clamp doesn't leave scope.
 	if (FindGhostItemPlacementLocation(Hit) && CarriedItem != nullptr)
 	{
+		FActorSpawnParameters ActorSpawnParams;
+		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		FRotator CarriedItemRotation = CarriedItem->GetActorRotation();
-		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, CarriedItemRotation);
-		GhostItem->GetStaticMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, CarriedItemRotation, ActorSpawnParams);
+		GhostItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
 		//TODO give the ghost item a transparent material;
@@ -155,5 +157,18 @@ void UItemPlacementComponent::RotateItem(bool bIsRightRotation)
 	if (CarriedItem != nullptr && GhostItem != nullptr)
 	{
 		GhostItem->RotateRight(bIsRightRotation);
+	}
+}
+
+void UItemPlacementComponent::AdjustLineTraceLength(bool bShouldIncrease)
+{
+	//TODO clamp and have default value between carries;
+	if(bShouldIncrease)
+	{
+		LineTraceLength += LineTraceAdjustmentAmount;
+	}
+	else
+	{
+		LineTraceLength -= LineTraceAdjustmentAmount;
 	}
 }

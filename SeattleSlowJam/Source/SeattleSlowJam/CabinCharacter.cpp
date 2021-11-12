@@ -232,6 +232,14 @@ void ACabinCharacter::RotateTimerExpired()
 	bCanRotateItem = true;
 }
 
+void ACabinCharacter::AdjustItemLineTraceLength(float Value)
+{
+	if (Value != 0.0f)
+	{
+		ItemPlacementComponent->AdjustLineTraceLength(Value > 0.0f);
+	}
+}
+
 //--------------------------------- Character Mode Switch -------------------------------------------
 void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 {

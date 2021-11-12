@@ -31,9 +31,15 @@ public:
 
 	void RotateItem(bool bIsRightRotation);
 
+	void AdjustLineTraceLength(bool bShouldIncrease);
+
 private:
 	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float LineTraceLength = 1000.0f;
+	float DefaultLineTraceLength = 1000.0f;
+	
+	float LineTraceLength;
+
+	float LineTraceAdjustmentAmount = 10.0f;
 
 	class APlaceableItem* CarriedItem = nullptr;
 
