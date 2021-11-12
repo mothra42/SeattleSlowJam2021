@@ -56,11 +56,7 @@ void APlaceableItem::AdjustHeight()
 	}
 }
 
-void APlaceableItem::PlaceItem()
+void APlaceableItem::TeleportToBasement()
 {
-	if (bIsCarried)
-	{
-		//if the item is carried by the player they can put it down in front of them
-		//or on a grid, undetermined.
-	}
+	SetActorLocation(BasementTeleportLocation);
 }
