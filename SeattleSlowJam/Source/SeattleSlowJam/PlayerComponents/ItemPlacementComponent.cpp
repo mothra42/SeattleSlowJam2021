@@ -73,34 +73,9 @@ void UItemPlacementComponent::SpawnGhostItem()
 void UItemPlacementComponent::UpdateGhostItemLocation()
 {
 	FHitResult Hit;
-	FHitResult SweepHit;
-	bool bDidActorMove;
 	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
 	{
-		bDidActorMove = GhostItem->SetActorLocation(Hit.Location, true, &SweepHit, ETeleportType::None);
-		//if (!bDidActorMove)
-		//{
-		//	//TODO do some checks to see which Coordinates need to be preserved
-		//	FVector ComparisonVector = (GhostItem->GetActorLocation() - SweepHit.ImpactPoint).GetAbs();
-		//	if (ComparisonVector.X > 0.0001)
-		//	{
-		//		FVector MoveToLocation = FVector(GhostItem->GetActorLocation().X, Hit.Location.Y, Hit.Location.Z);
-		//		UE_LOG(LogTemp, Warning, TEXT("Keep X the same"));
-		//		GhostItem->SetActorLocation(MoveToLocation);
-		//	}
-		//	else if (ComparisonVector.Y > 0.0001)
-		//	{
-		//		FVector MoveToLocation = FVector(Hit.Location.X, GhostItem->GetActorLocation().Y, Hit.Location.Z);
-		//		UE_LOG(LogTemp, Warning, TEXT("Keep Y the same"));
-		//		GhostItem->SetActorLocation(MoveToLocation);
-		//	}
-		//	else
-		//	{
-		//		FVector MoveToLocation = FVector(Hit.Location.X, Hit.Location.Y, GhostItem->GetActorLocation().Z);
-		//		UE_LOG(LogTemp, Warning, TEXT("Keep Z the same"));
-		//		GhostItem->SetActorLocation(MoveToLocation);
-		//	}
-		//}
+		GhostItem->SetActorLocation(Hit.Location);
 	}
 	else
 	{
@@ -108,48 +83,33 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 		ACabinCharacter* PlayerCharacter = Cast<ACabinCharacter>(GetOwner());
 		FVector StartLocation = PlayerCharacter->GetFollowCamera()->GetComponentLocation();
 		FVector EndLocation = StartLocation + PlayerCharacter->GetFollowCamera()->GetForwardVector() * LineTraceLength;
-		bDidActorMove = GhostItem->SetActorLocation(EndLocation, true, &SweepHit, ETeleportType::None);
-		if (SweepHit.Actor != nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Hit is at %s"), *SweepHit.Actor->GetName());
+		GhostItem->SetActorLocation(EndLocation);
+	}
 
-			//if (!bDidActorMove)
-			//{
-			//	//TODO do some checks to see which Coordinates need to be preserved
-			//	FVector ComparisonVector = (GhostItem->GetActorLocation() - SweepHit.ImpactPoint).GetAbs();
-			//	if (ComparisonVector.X > 0.0001)
-			//	{
-			//		FVector MoveToLocation = FVector(GhostItem->GetActorLocation().X, Hit.Location.Y, Hit.Location.Z);
-			//		UE_LOG(LogTemp, Warning, TEXT("Keep X the same"));
-			//		GhostItem->SetActorLocation(MoveToLocation);
-			//	}
-			//	else if (ComparisonVector.Y > 0.0001)
-			//	{
-			//		FVector MoveToLocation = FVector(Hit.Location.X, GhostItem->GetActorLocation().Y, Hit.Location.Z);
-			//		UE_LOG(LogTemp, Warning, TEXT("Keep Y the same"));
-			//		GhostItem->SetActorLocation(MoveToLocation);
-			//	}
-			//	else
-			//	{
-			//		FVector MoveToLocation = FVector(Hit.Location.X, Hit.Location.Y, GhostItem->GetActorLocation().Z);
-			//		UE_LOG(LogTemp, Warning, TEXT("Keep Z the same"));
-			//		GhostItem->SetActorLocation(MoveToLocation);
-			//	}
-			//}
-		}
+	TSet<AActor*> OverlappedActors;
+	GhostItem->GetOverlappingActors(OverlappedActors);
+	if (OverlappedActors.Num() > 0)
+	{
+		//make object red showing its unplaceable
+		UE_LOG(LogTemp, Warning, TEXT("Overlapping actors"));
 	}
 }
 
 void UItemPlacementComponent::FinishPlacingItem()
 {
-	FTransform NewTransform = GhostItem->GetActorTransform();
-	GhostItem->Destroy();
-	GhostItem = nullptr;
-	NewTransform.SetScale3D(FVector(1.0, 1.0, 1.0));
-	CarriedItem->SetActorTransform(NewTransform);
-	CarriedItem->SetActorHiddenInGame(false);
-	CarriedItem->SetActorEnableCollision(true);
-	CarriedItem = nullptr;
+	TSet<AActor*> OverlappedActors;
+	GhostItem->GetOverlappingActors(OverlappedActors);
+	if (OverlappedActors.Num() <= 0)
+	{
+		FVector NewLocation = GhostItem->GetActorLocation();
+		FRotator NewRotation = GhostItem->GetActorRotation();
+		GhostItem->Destroy();
+		GhostItem = nullptr;
+		CarriedItem->SetActorLocationAndRotation(NewLocation, NewRotation);
+		CarriedItem->SetActorHiddenInGame(false);
+		CarriedItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+		CarriedItem = nullptr;
+	}
 }
 
 void UItemPlacementComponent::RotateItem(bool bIsRightRotation)

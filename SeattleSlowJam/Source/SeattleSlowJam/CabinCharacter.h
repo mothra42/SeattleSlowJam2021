@@ -68,6 +68,8 @@ protected:
 
 	void RotateItem(float Value);
 
+	void AdjustItemLineTraceLength(float Value);
+
 private:
 	bool bIsItemAdjustmentMode = false;
 

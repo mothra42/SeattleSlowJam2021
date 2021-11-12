@@ -81,6 +81,8 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("EnterItemAdjustmentMode", IE_Pressed, this, &ACabinCharacter::EnterItemAdjustmentMode);
 	PlayerInputComponent->BindAction("EnterItemAdjustmentMode", IE_Released, this, &ACabinCharacter::ExitItemAdjustmentMode);
 	PlayerInputComponent->BindAxis("RotateRight", this, &ACabinCharacter::RotateItem);
+	PlayerInputComponent->BindAxis("AdjustLineTraceLength", this, &ACabinCharacter::AdjustItemLineTraceLength);
+
 
 }
 
@@ -180,12 +182,15 @@ void ACabinCharacter::PickupItem()
 	//also handle calling methods in ItemPlacementComponent	
 	if (SweepForPlaceableItem(Hit))
 	{
-		ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
-		Hit.Actor->SetActorEnableCollision(false);
-		Hit.Actor->SetActorHiddenInGame(true);
-		ItemPlacementComponent->SpawnGhostItem();
+		APlaceableItem* ItemToCarry = Cast<APlaceableItem>(Hit.Actor);
+		if (ItemToCarry != nullptr)
+		{
+			ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
+			ItemToCarry->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+			ItemToCarry->SetActorHiddenInGame(true);
+			ItemPlacementComponent->SpawnGhostItem();
+		}
 	}
-	
 }
 
 bool ACabinCharacter::SweepForPlaceableItem(FHitResult& Hit)
@@ -204,7 +209,10 @@ void ACabinCharacter::PlaceItem()
 
 void ACabinCharacter::EnterItemAdjustmentMode()
 {
-	bIsItemAdjustmentMode = true;
+	if (ItemPlacementComponent->GetCarriedItem() != nullptr)
+	{
+		bIsItemAdjustmentMode = true;
+	}
 }
 
 void ACabinCharacter::ExitItemAdjustmentMode()
