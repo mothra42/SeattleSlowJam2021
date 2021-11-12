@@ -28,6 +28,9 @@ protected:
 	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
 	bool bCanBePlacedOnWall = false;
 
+	UPROPERTY(Category = "TeleportSettings", VisibleAnywhere, BlueprintReadWrite)
+	FVector BasementTeleportLocation;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -41,7 +44,7 @@ public:
 
 	void AdjustHeight();
 
-	void PlaceItem();
+	void TeleportToBasement();
 
 	FORCEINLINE UStaticMeshComponent* GetStaticMesh() const { return ItemMesh; }
 	FORCEINLINE void SetItemStaticMesh(UStaticMeshComponent* ItemMeshToSet) { ItemMesh->SetStaticMesh(ItemMeshToSet->GetStaticMesh()); }
