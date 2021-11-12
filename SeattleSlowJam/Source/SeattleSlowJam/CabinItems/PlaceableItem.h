@@ -28,7 +28,7 @@ protected:
 	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
 	bool bCanBePlacedOnWall = false;
 
-	UPROPERTY(Category = "TeleportSettings", VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadWrite)
 	FVector BasementTeleportLocation;
 
 	// Called when the game starts or when spawned
