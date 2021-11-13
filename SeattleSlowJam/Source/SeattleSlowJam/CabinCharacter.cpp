@@ -53,6 +53,8 @@ ACabinCharacter::ACabinCharacter()
 	ItemAtachmentComponent->SetupAttachment(RootComponent);
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACabinCharacter::OnBeginOverlap);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -248,8 +250,30 @@ void ACabinCharacter::AdjustItemLineTraceLength(float Value)
 	}
 }
 
+void ACabinCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, 
+	AActor* OtherActor, 
+	UPrimitiveComponent* OtherComp, 
+	int32 OtherBodyIndex, 
+	bool bFromSweep, 
+	const FHitResult& SweepResult)
+{
+	TryTeleportItemToBasement(OtherActor);
+}
+
+void ACabinCharacter::TryTeleportItemToBasement(AActor* ActorToTeleport)
+{
+	APlaceableItem* ItemToTeleport = Cast<APlaceableItem>(ActorToTeleport) ;
+	if (ItemToTeleport != nullptr && bIsMovementConstrained)
+	{
+		ItemToTeleport->TeleportToBasement();
+	}
+}
+
 //--------------------------------- Character Mode Switch -------------------------------------------
 void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 {
 	bIsMovementConstrained = bShouldConstrainMovement;
 }
+
+//TODO add OnComponentBeginOverlap to the capsule component to check for items in the dungeon.
+//if it overlaps one in the dungeon call the teleport method. 

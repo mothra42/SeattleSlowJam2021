@@ -77,6 +77,9 @@ private:
 
 	bool bCanRotateItem = true;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
+	float RotationRate = 0.3f;
+
 	FTimerHandle TimerHandle_RotateItemTimerExpired;
 
 	void EnterItemAdjustmentMode();
@@ -85,8 +88,7 @@ private:
 
 	void RotateTimerExpired();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
-	float RotationRate = 0.3f;
+	void TryTeleportItemToBasement(AActor* ActorToTeleport);
 
 protected:
 	// APawn interface
@@ -94,6 +96,15 @@ protected:
 	// End of APawn interface
 private:
 	bool bIsMovementConstrained = false;
+
+public:
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, 
+		AActor* OtherActor, 
+		UPrimitiveComponent* OtherComp, 
+		int32 OtherBodyIndex, 
+		bool bFromSweep, 
+		const FHitResult& SweepResult);
 
 public:
 	/** Returns CameraBoom subobject **/
