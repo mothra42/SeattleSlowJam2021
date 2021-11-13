@@ -9,7 +9,7 @@
 APlaceableItem::APlaceableItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	//Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	//RootComponent = Root;
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
@@ -28,7 +28,7 @@ void APlaceableItem::BeginPlay()
 void APlaceableItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	UE_LOG(LogTemp, Warning, TEXT("I Exist"));
 }
 
 void APlaceableItem::RotateRight(bool bIsRightRotation)
@@ -58,5 +58,5 @@ void APlaceableItem::AdjustHeight()
 
 void APlaceableItem::TeleportToBasement()
 {
-	SetActorLocation(BasementTeleportLocation);
+	SetActorLocation(BasementTeleportLocation, true);
 }
