@@ -4,12 +4,13 @@
 #include "PlaceableItem.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
+#include "../ScriptingActors/ItemTeleportationArea.h"
 
 // Sets default values
 APlaceableItem::APlaceableItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	//Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	//RootComponent = Root;
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
@@ -28,7 +29,6 @@ void APlaceableItem::BeginPlay()
 void APlaceableItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void APlaceableItem::RotateRight(bool bIsRightRotation)
@@ -58,5 +58,13 @@ void APlaceableItem::AdjustHeight()
 
 void APlaceableItem::TeleportToBasement()
 {
-	SetActorLocation(BasementTeleportLocation);
+	SetActorLocation(BasementTeleportLocation, true);
+	if (TeleportationArea != nullptr)
+	{
+		TeleportationArea->CheckShouldPortalDoorOpen();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *GetName());
+	}
 }
