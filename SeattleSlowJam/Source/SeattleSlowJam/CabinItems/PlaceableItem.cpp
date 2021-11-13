@@ -4,6 +4,7 @@
 #include "PlaceableItem.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
+#include "../ScriptingActors/ItemTeleportationArea.h"
 
 // Sets default values
 APlaceableItem::APlaceableItem()
@@ -28,7 +29,6 @@ void APlaceableItem::BeginPlay()
 void APlaceableItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("I Exist"));
 }
 
 void APlaceableItem::RotateRight(bool bIsRightRotation)
@@ -59,4 +59,12 @@ void APlaceableItem::AdjustHeight()
 void APlaceableItem::TeleportToBasement()
 {
 	SetActorLocation(BasementTeleportLocation, true);
+	if (TeleportationArea != nullptr)
+	{
+		TeleportationArea->CheckShouldPortalDoorOpen();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *GetName());
+	}
 }

@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadWrite)
 	FVector BasementTeleportLocation;
 
+	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadOnly)
+	class AItemTeleportationArea* TeleportationArea;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -48,5 +51,6 @@ public:
 
 	FORCEINLINE UStaticMeshComponent* GetStaticMesh() const { return ItemMesh; }
 	FORCEINLINE void SetItemStaticMesh(UStaticMeshComponent* ItemMeshToSet) { ItemMesh->SetStaticMesh(ItemMeshToSet->GetStaticMesh()); }
+	FORCEINLINE AItemTeleportationArea* GetTeleportationArea() const { return TeleportationArea; }
 
 };
