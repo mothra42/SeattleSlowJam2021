@@ -7,6 +7,7 @@
 #include "../CabinCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "../ScriptingActors/ItemTeleportationArea.h"
 
 // Sets default values for this component's properties
 UItemPlacementComponent::UItemPlacementComponent()
@@ -108,6 +109,15 @@ void UItemPlacementComponent::FinishPlacingItem()
 		CarriedItem->SetActorLocationAndRotation(NewLocation, NewRotation);
 		CarriedItem->SetActorHiddenInGame(false);
 		CarriedItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+		AItemTeleportationArea* TeleportationArea = CarriedItem->GetTeleportationArea();
+		if (TeleportationArea != nullptr)
+		{
+			TeleportationArea->CheckShouldPortalDoorOpen();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *CarriedItem->GetName());
+		}
 		CarriedItem = nullptr;
 	}
 }
