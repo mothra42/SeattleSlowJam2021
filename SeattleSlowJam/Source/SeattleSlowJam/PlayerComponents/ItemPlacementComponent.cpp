@@ -36,7 +36,6 @@ void UItemPlacementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	ACabinCharacter* Owner = Cast<ACabinCharacter>(GetOwner());
 	if (CarriedItem != nullptr && Owner != nullptr && !Owner->GetItemModeState())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Still ticking"));
 		UpdateGhostItemLocation();
 	}
 }
@@ -66,9 +65,11 @@ void UItemPlacementComponent::SpawnGhostItem()
 		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		FRotator CarriedItemRotation = CarriedItem->GetActorRotation();
 		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, CarriedItemRotation, ActorSpawnParams);
+		GhostItem->SetActorScale3D(CarriedItem->GetActorScale3D());
 		GhostItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
+		GhostItem->GetStaticMesh()->SetMaterial(0, CarriedItem->GetStaticMesh()->GetMaterial(0));
 		GhostItem->bCanBePlacedOnWall = CarriedItem->bCanBePlacedOnWall;
 		//TODO give the ghost item a transparent material;
 	}
@@ -76,7 +77,6 @@ void UItemPlacementComponent::SpawnGhostItem()
 
 void UItemPlacementComponent::UpdateGhostItemLocation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Calling Update"));
 	FHitResult Hit;
 	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
 	{
@@ -91,17 +91,7 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 		GhostItem->SetActorLocation(EndLocation);
 	}
 
-	TArray<AActor*> OverlappedActors;
-	GhostItem->GetOverlappingActors(OverlappedActors);
-	for (AActor* OverlappedActor : OverlappedActors)
-	{
-		//if (Cast<APlaceableItem>(OverlappedActor) != nullptr)
-		//{
-		//	OverlappedActors.Remove(OverlappedActor);
-		//}
-		//UE_LOG(LogTemp, Warning, TEXT("Overlapping actors is %i long"), OverlappedActors.Num());
-	}
-	if (OverlappedActors.Num() > 0)
+	if (!bAreOverlappedActorsValid())
 	{
 		//make object red showing its unplaceable
 		UE_LOG(LogTemp, Warning, TEXT("Overlapping actors"));
@@ -110,9 +100,12 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 
 void UItemPlacementComponent::FinishPlacingItem()
 {
-	TSet<AActor*> OverlappedActors;
+	TArray<AActor*> OverlappedActors;
+	TArray<AActor*> OverlappedPlaceableItems;
 	GhostItem->GetOverlappingActors(OverlappedActors);
-	if (OverlappedActors.Num() <= 0)
+	TSubclassOf<APlaceableItem> PlaceableItemClass;
+	GhostItem->GetOverlappingActors(OverlappedPlaceableItems, PlaceableItemClass);
+	if (bAreOverlappedActorsValid())
 	{
 		FVector NewLocation = GhostItem->GetActorLocation();
 		FRotator NewRotation = GhostItem->GetActorRotation();
@@ -165,4 +158,15 @@ void UItemPlacementComponent::MoveItemUp(float Value)
 	{
 		GhostItem->AdjustHeight(false);
 	}
+}
+
+bool UItemPlacementComponent::bAreOverlappedActorsValid()
+{
+	TArray<AActor*> OverlappedActors;
+	TArray<AActor*> OverlappedPlaceableItems;
+	GhostItem->GetOverlappingActors(OverlappedActors);
+	TSubclassOf<APlaceableItem> PlaceableItemClass;
+	GhostItem->GetOverlappingActors(OverlappedPlaceableItems, PlaceableItemClass);
+
+	return (OverlappedActors.Num() == OverlappedPlaceableItems.Num() || OverlappedActors.Num() <= 0);
 }

@@ -51,6 +51,8 @@ private:
 
 	void UpdateGhostItemLocation();
 
+	bool bAreOverlappedActorsValid();
+
 // getters and setters
 public:
 	FORCEINLINE void SetCarriedItem(APlaceableItem* ItemToCarry) { CarriedItem = ItemToCarry; }
