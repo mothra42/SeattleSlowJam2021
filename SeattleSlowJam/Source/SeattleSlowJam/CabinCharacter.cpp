@@ -244,9 +244,14 @@ void ACabinCharacter::RotateTimerExpired()
 
 void ACabinCharacter::AdjustItemLineTraceLength(float Value)
 {
-	if (Value != 0.0f)
+	if (Value != 0.0f && !bIsItemAdjustmentMode)
 	{
 		ItemPlacementComponent->AdjustLineTraceLength(Value > 0.0f);
+	}
+	else if (Value != 0.0f && bIsItemAdjustmentMode)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Working"));
+		ItemPlacementComponent->MoveItemUp(Value);
 	}
 }
 

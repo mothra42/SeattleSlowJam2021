@@ -48,11 +48,22 @@ void APlaceableItem::RotateRight(bool bIsRightRotation)
 	SetActorRotation(NewObjectRotation);
 }
 
-void APlaceableItem::AdjustHeight()
+void APlaceableItem::AdjustHeight(bool bIsUp)
 {
 	if (bCanBePlacedOnWall)
 	{
-		//Allow player to adjust height to a certain limit
+		UE_LOG(LogTemp, Warning, TEXT("Still working"));
+		FVector NewLocation;
+		if (bIsUp)
+		{
+			NewLocation = GetActorLocation() + (FVector::UpVector * ZMovementStepSize);
+		}
+		else
+		{
+			NewLocation = GetActorLocation() - (FVector::UpVector * ZMovementStepSize);
+		}
+		UE_LOG(LogTemp, Warning, TEXT("New Location is %s"), *NewLocation.ToString());
+		SetActorLocation(NewLocation);
 	}
 }
 

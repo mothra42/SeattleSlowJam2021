@@ -33,8 +33,10 @@ void UItemPlacementComponent::BeginPlay()
 void UItemPlacementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (CarriedItem != nullptr)
+	ACabinCharacter* Owner = Cast<ACabinCharacter>(GetOwner());
+	if (CarriedItem != nullptr && Owner != nullptr && !Owner->GetItemModeState())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Still ticking"));
 		UpdateGhostItemLocation();
 	}
 }
@@ -67,12 +69,14 @@ void UItemPlacementComponent::SpawnGhostItem()
 		GhostItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
 		GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
+		GhostItem->bCanBePlacedOnWall = CarriedItem->bCanBePlacedOnWall;
 		//TODO give the ghost item a transparent material;
 	}
 }
 
 void UItemPlacementComponent::UpdateGhostItemLocation()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Calling Update"));
 	FHitResult Hit;
 	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
 	{
@@ -87,8 +91,16 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 		GhostItem->SetActorLocation(EndLocation);
 	}
 
-	TSet<AActor*> OverlappedActors;
+	TArray<AActor*> OverlappedActors;
 	GhostItem->GetOverlappingActors(OverlappedActors);
+	for (AActor* OverlappedActor : OverlappedActors)
+	{
+		//if (Cast<APlaceableItem>(OverlappedActor) != nullptr)
+		//{
+		//	OverlappedActors.Remove(OverlappedActor);
+		//}
+		//UE_LOG(LogTemp, Warning, TEXT("Overlapping actors is %i long"), OverlappedActors.Num());
+	}
 	if (OverlappedActors.Num() > 0)
 	{
 		//make object red showing its unplaceable
@@ -140,5 +152,17 @@ void UItemPlacementComponent::AdjustLineTraceLength(bool bShouldIncrease)
 	else
 	{
 		LineTraceLength -= LineTraceAdjustmentAmount;
+	}
+}
+
+void UItemPlacementComponent::MoveItemUp(float Value)
+{
+	if (Value > 0.0f)
+	{
+		GhostItem->AdjustHeight(true);
+	}
+	else
+	{
+		GhostItem->AdjustHeight(false);
 	}
 }

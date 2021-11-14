@@ -25,8 +25,8 @@ protected:
 	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
 	float RotationAmountDegrees = 15.0f;
 
-	UPROPERTY(Category = "ItemSettings", EditDefaultsOnly)
-	bool bCanBePlacedOnWall = false;
+	UPROPERTY(Category = "ItemSettings", EditAnywhere)
+	float ZMovementStepSize = 10.0f;
 
 	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadWrite)
 	FVector BasementTeleportLocation;
@@ -38,6 +38,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	UPROPERTY(Category = "ItemSettings", EditAnywhere)
+	bool bCanBePlacedOnWall = false;
+
 	bool bIsCarried = false;
 
 	bool bIsPreparedToTeleport = false;
@@ -47,7 +50,7 @@ public:
 
 	void RotateRight(bool bIsRightRotation);
 
-	void AdjustHeight();
+	void AdjustHeight(bool bIsUp);
 
 	void PrepareToTeleportToBasement();
 
