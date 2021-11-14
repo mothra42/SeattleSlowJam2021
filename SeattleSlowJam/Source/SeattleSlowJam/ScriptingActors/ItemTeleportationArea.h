@@ -29,10 +29,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CheckShouldPortalDoorOpen();
 
+	UFUNCTION(BlueprintCallable)
+	void TeleportAllCollectedItems();
+
+	void AddItemToTeleport(class APlaceableItem* ItemToTeleport);
+
+	void ClearItemsToTeleport();
+
 private:
 	bool bShouldPortalDoorBeOpen = true;
 
-	TArray<class AActor*> OverlappingActors;
+	TArray<AActor*> OverlappingActors;
+
+	TArray<APlaceableItem*> ItemsToTeleport;
 
 	int32 GetNumOfPlaceableItems();
 
