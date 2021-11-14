@@ -77,8 +77,8 @@ private:
 
 	bool bCanRotateItem = true;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
-	float RotationRate = 0.3f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
+	float ItemRotationRate = 0.1f;
 
 	FTimerHandle TimerHandle_RotateItemTimerExpired;
 

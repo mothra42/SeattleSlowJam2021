@@ -229,7 +229,7 @@ void ACabinCharacter::RotateItem(float Value)
 		GetWorld()->GetTimerManager().SetTimer(
 			TimerHandle_RotateItemTimerExpired, 
 			this, 
-			&ACabinCharacter::RotateTimerExpired, RotationRate
+			&ACabinCharacter::RotateTimerExpired, ItemRotationRate
 		);
 
 		bCanRotateItem = false;
