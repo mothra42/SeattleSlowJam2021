@@ -56,9 +56,14 @@ void APlaceableItem::AdjustHeight()
 	}
 }
 
+void APlaceableItem::PrepareToTeleportToBasement()
+{
+	TeleportationArea->AddItemToTeleport(this);
+}
+
 void APlaceableItem::TeleportToBasement()
 {
-	SetActorLocation(BasementTeleportLocation, true);
+	SetActorLocation(BasementTeleportLocation);
 	if (TeleportationArea != nullptr)
 	{
 		TeleportationArea->CheckShouldPortalDoorOpen();

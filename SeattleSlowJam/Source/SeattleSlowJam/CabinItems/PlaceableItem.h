@@ -40,12 +40,16 @@ protected:
 public:	
 	bool bIsCarried = false;
 
+	bool bIsPreparedToTeleport = false;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void RotateRight(bool bIsRightRotation);
 
 	void AdjustHeight();
+
+	void PrepareToTeleportToBasement();
 
 	void TeleportToBasement();
 

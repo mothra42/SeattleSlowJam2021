@@ -263,9 +263,10 @@ void ACabinCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 void ACabinCharacter::TryTeleportItemToBasement(AActor* ActorToTeleport)
 {
 	APlaceableItem* ItemToTeleport = Cast<APlaceableItem>(ActorToTeleport) ;
-	if (ItemToTeleport != nullptr) //&& bIsMovementConstrained)
+	if (ItemToTeleport != nullptr && !ItemToTeleport->bIsPreparedToTeleport && bIsMovementConstrained)
 	{
-		ItemToTeleport->TeleportToBasement();
+		ItemToTeleport->PrepareToTeleportToBasement();
+		ItemToTeleport->SetActorHiddenInGame(true);
 	}
 }
 
