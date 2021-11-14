@@ -38,6 +38,10 @@ public:
 private:
 	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float DefaultLineTraceLength = 1000.0f;
+	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MinDistanceToLineTrace = 600;
+	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MaxDistanceToLineTrace = 1500;
 	
 	float LineTraceLength;
 
