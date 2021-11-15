@@ -59,3 +59,24 @@ bool AItemTeleportationArea::CheckShouldPortalDoorOpen()
 
 	return bShouldPortalDoorBeOpen;
 }
+
+void AItemTeleportationArea::TeleportAllCollectedItems()
+{
+	for (APlaceableItem* ItemToTeleport : ItemsToTeleport)
+	{
+		ItemToTeleport->TeleportToBasement();
+		ItemToTeleport->SetActorHiddenInGame(false);
+		ItemToTeleport->GetStaticMesh()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	}
+	ClearItemsToTeleport();
+}
+
+void AItemTeleportationArea::AddItemToTeleport(APlaceableItem* ItemToTeleport)
+{
+	ItemsToTeleport.Add(ItemToTeleport);
+}
+
+void AItemTeleportationArea::ClearItemsToTeleport()
+{
+	ItemsToTeleport.Empty();
+}

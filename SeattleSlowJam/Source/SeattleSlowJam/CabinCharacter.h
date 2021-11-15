@@ -77,8 +77,8 @@ private:
 
 	bool bCanRotateItem = true;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
-	float RotationRate = 0.3f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
+	float ItemRotationRate = 0.1f;
 
 	FTimerHandle TimerHandle_RotateItemTimerExpired;
 
@@ -111,5 +111,7 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	FORCEINLINE bool GetItemModeState() const { return bIsItemAdjustmentMode; }
 };
 

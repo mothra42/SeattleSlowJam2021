@@ -229,7 +229,7 @@ void ACabinCharacter::RotateItem(float Value)
 		GetWorld()->GetTimerManager().SetTimer(
 			TimerHandle_RotateItemTimerExpired, 
 			this, 
-			&ACabinCharacter::RotateTimerExpired, RotationRate
+			&ACabinCharacter::RotateTimerExpired, ItemRotationRate
 		);
 
 		bCanRotateItem = false;
@@ -244,9 +244,14 @@ void ACabinCharacter::RotateTimerExpired()
 
 void ACabinCharacter::AdjustItemLineTraceLength(float Value)
 {
-	if (Value != 0.0f)
+	if (Value != 0.0f && !bIsItemAdjustmentMode)
 	{
 		ItemPlacementComponent->AdjustLineTraceLength(Value > 0.0f);
+	}
+	else if (Value != 0.0f && bIsItemAdjustmentMode)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Working"));
+		ItemPlacementComponent->MoveItemUp(Value);
 	}
 }
 
@@ -263,9 +268,10 @@ void ACabinCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 void ACabinCharacter::TryTeleportItemToBasement(AActor* ActorToTeleport)
 {
 	APlaceableItem* ItemToTeleport = Cast<APlaceableItem>(ActorToTeleport) ;
-	if (ItemToTeleport != nullptr) //&& bIsMovementConstrained)
+	if (ItemToTeleport != nullptr && !ItemToTeleport->bIsPreparedToTeleport && bIsMovementConstrained)
 	{
-		ItemToTeleport->TeleportToBasement();
+		ItemToTeleport->PrepareToTeleportToBasement();
+		ItemToTeleport->SetActorHiddenInGame(true);
 	}
 }
 

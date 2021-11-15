@@ -33,6 +33,8 @@ public:
 
 	void AdjustLineTraceLength(bool bShouldIncrease);
 
+	void MoveItemUp(float Value);
+
 private:
 	UPROPERTY(Category = "Item Placement Trace", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float DefaultLineTraceLength = 1000.0f;
@@ -48,6 +50,8 @@ private:
 	bool FindGhostItemPlacementLocation(FHitResult& Hit);
 
 	void UpdateGhostItemLocation();
+
+	bool bAreOverlappedActorsValid();
 
 // getters and setters
 public:
