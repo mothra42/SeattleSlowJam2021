@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../ScriptingActors/ItemTeleportationArea.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values for this component's properties
 UItemPlacementComponent::UItemPlacementComponent()
@@ -61,16 +62,22 @@ void UItemPlacementComponent::SpawnGhostItem()
 	LineTraceLength = DefaultLineTraceLength;
 	if (FindGhostItemPlacementLocation(Hit) && CarriedItem != nullptr)
 	{
+		UClass* GhostItemClass = CarriedItem->GetClass();
+		TSubclassOf<UStaticMeshComponent> MeshComponent;
 		FActorSpawnParameters ActorSpawnParams;
 		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		FRotator CarriedItemRotation = CarriedItem->GetActorRotation();
-		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, CarriedItemRotation, ActorSpawnParams);
-		GhostItem->SetActorRotation(CarriedItemRotation);
+		UE_LOG(LogTemp, Warning, TEXT("Carried Item class is %s"), *GhostItemClass->GetName());
+		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(GhostItemClass, CarriedItem->GetTransform());
+		GhostItem->ChangeCollisionResponse(ECR_Overlap);
+		//GhostItem->GetComponentsByClass(MeshComponent)
+		//GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, CarriedItemRotation, ActorSpawnParams);
+		//GhostItem->SetActorRotation(CarriedItemRotation);
 		GhostItem->SetActorScale3D(CarriedItem->GetActorScale3D());
-		GhostItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-		GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
-		GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
-		GhostItem->GetStaticMesh()->SetMaterial(0, CarriedItem->GetStaticMesh()->GetMaterial(0));
+		//GhostItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+		//GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
+		//GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
+		//GhostItem->GetStaticMesh()->SetMaterial(0, CarriedItem->GetStaticMesh()->GetMaterial(0));
 		GhostItem->bCanBePlacedOnWall = CarriedItem->bCanBePlacedOnWall;
 		//TODO give the ghost item a transparent material;
 	}
@@ -115,7 +122,7 @@ void UItemPlacementComponent::FinishPlacingItem()
 		GhostItem = nullptr;
 		CarriedItem->SetActorLocationAndRotation(NewLocation, NewRotation);
 		CarriedItem->SetActorHiddenInGame(false);
-		CarriedItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+		CarriedItem->ChangeCollisionResponse(ECR_Block);
 		AItemTeleportationArea* TeleportationArea = CarriedItem->GetTeleportationArea();
 		if (TeleportationArea != nullptr)
 		{

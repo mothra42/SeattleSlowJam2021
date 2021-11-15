@@ -66,7 +66,7 @@ void AItemTeleportationArea::TeleportAllCollectedItems()
 	{
 		ItemToTeleport->TeleportToBasement();
 		ItemToTeleport->SetActorHiddenInGame(false);
-		ItemToTeleport->GetStaticMesh()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+		ItemToTeleport->ChangeCollisionResponse(ECR_Block);
 	}
 	ClearItemsToTeleport();
 }

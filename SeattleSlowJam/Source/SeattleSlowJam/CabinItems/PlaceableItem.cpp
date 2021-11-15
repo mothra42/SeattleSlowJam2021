@@ -52,7 +52,6 @@ void APlaceableItem::AdjustHeight(bool bIsUp)
 {
 	if (bCanBePlacedOnWall)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Still working"));
 		FVector NewLocation;
 		if (bIsUp)
 		{
@@ -62,8 +61,7 @@ void APlaceableItem::AdjustHeight(bool bIsUp)
 		{
 			NewLocation = GetActorLocation() - (FVector::UpVector * ZMovementStepSize);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("New Location is %s"), *NewLocation.ToString());
-		SetActorLocation(NewLocation);
+		SetActorLocation(NewLocation, true);
 	}
 }
 
@@ -82,5 +80,15 @@ void APlaceableItem::TeleportToBasement()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *GetName());
+	}
+}
+
+void APlaceableItem::ChangeCollisionResponse(ECollisionResponse ResponseToSet)
+{
+	TInlineComponentArray<UStaticMeshComponent*> AllStaticMeshes;
+	GetComponents(AllStaticMeshes);
+	for (UStaticMeshComponent* Comp : AllStaticMeshes)
+	{
+		Comp->SetCollisionResponseToAllChannels(ResponseToSet);
 	}
 }
