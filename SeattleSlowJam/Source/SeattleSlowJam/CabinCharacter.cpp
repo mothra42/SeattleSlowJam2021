@@ -12,6 +12,7 @@
 #include "CabinItems/PlaceableItem.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "GameFramework/InputSettings.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACabinCharacter
@@ -49,8 +50,8 @@ ACabinCharacter::ACabinCharacter()
 
 	//ItemPlacement
 	ItemPlacementComponent = CreateDefaultSubobject<UItemPlacementComponent>(TEXT("ItemPlacementComponent"));
-	ItemAtachmentComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ItemAttachmentComponent"));
-	ItemAtachmentComponent->SetupAttachment(RootComponent);
+	SphereTraceOrigin = CreateDefaultSubobject<USceneComponent>(TEXT("SphereTraceOrigin"));
+	SphereTraceOrigin->SetupAttachment(RootComponent);
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
@@ -67,7 +68,7 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &ACabinCharacter::MoveForward);
+	FInputAxisBinding MoveForward = PlayerInputComponent->BindAxis("MoveForward", this, &ACabinCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACabinCharacter::MoveRight);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
@@ -179,15 +180,30 @@ void ACabinCharacter::Interact()
 // --------------------------------------------- Item Placement ------------------------------------------
 void ACabinCharacter::PickupItem()
 {
-	FHitResult Hit;
+	//FHitResult Hit;
+	TArray<FHitResult> HitResults;
 	//TODO for now should just make a slot on the skeletal mesh and attach the item to it.
 	//also handle calling methods in ItemPlacementComponent	
-	if (SweepForPlaceableItem(Hit))
+	if (SweepForPlaceableItem(HitResults))
 	{
-		APlaceableItem* ItemToCarry = Cast<APlaceableItem>(Hit.Actor);
+		//Will factor this out if I like it.
+		auto ClosestActor = HitResults[0].Actor;
+		for (FHitResult Hit : HitResults)
+		{
+			float CurrentClosestDistance = (SphereTraceOrigin->GetComponentLocation() - ClosestActor->GetActorLocation()).Size();
+			float NewDistance = (SphereTraceOrigin->GetComponentLocation() - Hit.Location).Size();
+			if (NewDistance < CurrentClosestDistance)
+			{
+				ClosestActor = Hit.Actor;
+			}
+		}
+		APlaceableItem* ItemToCarry = Cast<APlaceableItem>(ClosestActor);
+		//APlaceableItem* ItemToCarry = Cast<APlaceableItem>(Hit.Actor);
 		if (ItemToCarry != nullptr)
 		{
-			ItemPlacementComponent->SetCarriedItem(Cast<APlaceableItem>(Hit.Actor));
+			TSubclassOf<APlaceableItem> Class = ItemToCarry->GetClass();
+			UE_LOG(LogTemp, Warning, TEXT("Carried Item from character class is %s"), *Class->GetName());
+			ItemPlacementComponent->SetCarriedItem(ItemToCarry);
 			ItemToCarry->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 			ItemToCarry->SetActorHiddenInGame(true);
 			ItemPlacementComponent->SpawnGhostItem();
@@ -195,13 +211,15 @@ void ACabinCharacter::PickupItem()
 	}
 }
 
-bool ACabinCharacter::SweepForPlaceableItem(FHitResult& Hit)
+bool ACabinCharacter::SweepForPlaceableItem(TArray<FHitResult>& Hits)
 {
-	FVector TraceBegin = GetActorLocation() + FVector::DownVector * 75.0f;
-	FVector TraceEnd = GetActorLocation() + FVector::DownVector * 75.01f;
+	FVector TraceBegin = SphereTraceOrigin->GetComponentLocation();
+	FVector TraceEnd = SphereTraceOrigin->GetComponentLocation() + FVector::DownVector * 0.01f;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = { EObjectTypeQuery::ObjectTypeQuery7 };
-	return UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), TraceBegin, TraceEnd,
-		75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
+	return UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), TraceBegin, TraceEnd,
+		75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hits, true);
+	//return UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), TraceBegin, TraceEnd,
+	//	75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
 }
 
 void ACabinCharacter::PlaceItem()
@@ -279,6 +297,20 @@ void ACabinCharacter::TryTeleportItemToBasement(AActor* ActorToTeleport)
 void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 {
 	bIsMovementConstrained = bShouldConstrainMovement;
+	UInputSettings* Settings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
+	FKey Key = FKey(TEXT("W"));
+	if (bShouldConstrainMovement)
+	{
+		//remap 'W' to Jump
+		Settings->RemoveAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), Key));
+		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Jump"), Key));
+	}
+	else
+	{
+		//remap 'W' To MoveForward
+		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Jump"), Key));
+		Settings->AddAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), Key));
+	}
 }
 
 //TODO add OnComponentBeginOverlap to the capsule component to check for items in the dungeon.

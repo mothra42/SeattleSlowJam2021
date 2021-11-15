@@ -23,7 +23,7 @@ class ACabinCharacter : public ACharacter
 	class UItemPlacementComponent* ItemPlacementComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
-	class USceneComponent* ItemAtachmentComponent;
+	class USceneComponent* SphereTraceOrigin;
 public:
 	ACabinCharacter();
 
@@ -73,7 +73,8 @@ protected:
 private:
 	bool bIsItemAdjustmentMode = false;
 
-	bool SweepForPlaceableItem(FHitResult& Hit);
+	//bool SweepForPlaceableItem(FHitResult& Hit);
+	bool SweepForPlaceableItem(TArray<FHitResult>& Hits);
 
 	bool bCanRotateItem = true;
 

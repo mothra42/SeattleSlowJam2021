@@ -56,6 +56,8 @@ public:
 
 	void TeleportToBasement();
 
+	void ChangeCollisionResponse(ECollisionResponse ResponseToSet);
+
 	FORCEINLINE UStaticMeshComponent* GetStaticMesh() const { return ItemMesh; }
 	FORCEINLINE void SetItemStaticMesh(UStaticMeshComponent* ItemMeshToSet) { ItemMesh->SetStaticMesh(ItemMeshToSet->GetStaticMesh()); }
 	FORCEINLINE AItemTeleportationArea* GetTeleportationArea() const { return TeleportationArea; }
