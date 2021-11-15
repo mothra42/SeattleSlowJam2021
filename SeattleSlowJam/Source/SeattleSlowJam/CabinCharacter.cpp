@@ -12,6 +12,7 @@
 #include "CabinItems/PlaceableItem.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "GameFramework/InputSettings.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACabinCharacter
@@ -67,7 +68,7 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &ACabinCharacter::MoveForward);
+	FInputAxisBinding MoveForward = PlayerInputComponent->BindAxis("MoveForward", this, &ACabinCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACabinCharacter::MoveRight);
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
@@ -296,6 +297,20 @@ void ACabinCharacter::TryTeleportItemToBasement(AActor* ActorToTeleport)
 void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 {
 	bIsMovementConstrained = bShouldConstrainMovement;
+	UInputSettings* Settings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
+	FKey Key = FKey(TEXT("W"));
+	if (bShouldConstrainMovement)
+	{
+		//remap 'W' to Jump
+		Settings->RemoveAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), Key));
+		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Jump"), Key));
+	}
+	else
+	{
+		//remap 'W' To MoveForward
+		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Jump"), Key));
+		Settings->AddAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), Key));
+	}
 }
 
 //TODO add OnComponentBeginOverlap to the capsule component to check for items in the dungeon.
