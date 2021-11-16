@@ -85,8 +85,17 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("EnterItemAdjustmentMode", IE_Released, this, &ACabinCharacter::ExitItemAdjustmentMode);
 	PlayerInputComponent->BindAxis("RotateRight", this, &ACabinCharacter::RotateItem);
 	PlayerInputComponent->BindAxis("AdjustLineTraceLength", this, &ACabinCharacter::AdjustItemLineTraceLength);
+}
 
+void ACabinCharacter::BeginPlay()
+{
+	Super::BeginPlay();
 
+	//Set W Key mapping in case it was not reset.
+	UInputSettings* Settings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
+	FKey Key = FKey(TEXT("W"));
+	Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Jump"), Key));
+	Settings->AddAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), Key));
 }
 
 void ACabinCharacter::AddControllerYawInput(float Value)

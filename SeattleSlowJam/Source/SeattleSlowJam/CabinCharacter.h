@@ -39,6 +39,8 @@ public:
 	void ShouldConstrainMovement(bool bShouldConstrainMovement);
 
 protected:
+	virtual void BeginPlay() override;
+
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
