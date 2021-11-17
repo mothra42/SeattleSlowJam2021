@@ -322,5 +322,8 @@ void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 	}
 }
 
-//TODO add OnComponentBeginOverlap to the capsule component to check for items in the dungeon.
-//if it overlaps one in the dungeon call the teleport method. 
+void ACabinCharacter::TakeDamage()
+{
+	//TODO Take damage
+	UE_LOG(LogTemp, Warning, TEXT("Taking Damage"));
+}

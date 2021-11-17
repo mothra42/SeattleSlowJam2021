@@ -38,6 +38,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ShouldConstrainMovement(bool bShouldConstrainMovement);
 
+	void TakeDamage();
+
 protected:
 	virtual void BeginPlay() override;
 
