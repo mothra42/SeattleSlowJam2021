@@ -62,21 +62,24 @@ bool AItemTeleportationArea::CheckShouldPortalDoorOpen()
 
 void AItemTeleportationArea::TeleportAllCollectedItems()
 {
-	for (APlaceableItem* ItemToTeleport : ItemsToTeleport)
+	for (FSpawnInstructions Instruction : SpawnInstructions)
 	{
-		ItemToTeleport->TeleportToBasement();
-		ItemToTeleport->SetActorHiddenInGame(false);
-		ItemToTeleport->ChangeCollisionResponse(ECR_Block);
+		GetWorld()->SpawnActor<APlaceableItem>(Instruction.ItemToSpawn, Instruction.Location, Instruction.Rotation);
 	}
 	ClearItemsToTeleport();
 }
 
 void AItemTeleportationArea::AddItemToTeleport(APlaceableItem* ItemToTeleport)
 {
-	ItemsToTeleport.Add(ItemToTeleport);
+	FSpawnInstructions SpawnInstruction(
+		ItemToTeleport->BasementTeleportLocation,
+		ItemToTeleport->GetClass(),
+		ItemToTeleport->GetActorRotation());
+	SpawnInstructions.Add(SpawnInstruction);
+	ItemToTeleport->Destroy();
 }
 
 void AItemTeleportationArea::ClearItemsToTeleport()
 {
-	ItemsToTeleport.Empty();
+	SpawnInstructions.Empty();
 }

@@ -40,7 +40,11 @@ public:
 
 	void TakeDamage();
 
+	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadWrite)
+	class AItemTeleportationArea* TeleportationArea;
+
 protected:
+
 	virtual void BeginPlay() override;
 
 	/** Called for forwards/backward input */

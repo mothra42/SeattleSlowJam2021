@@ -115,7 +115,7 @@ void UItemPlacementComponent::FinishPlacingItem()
 		CarriedItem->SetActorLocationAndRotation(NewLocation, NewRotation);
 		CarriedItem->SetActorHiddenInGame(false);
 		CarriedItem->ChangeCollisionResponse(ECR_Block);
-		AItemTeleportationArea* TeleportationArea = CarriedItem->GetTeleportationArea();
+		AItemTeleportationArea* TeleportationArea = Cast<ACabinCharacter>(GetOwner())->TeleportationArea;
 		if (TeleportationArea != nullptr)
 		{
 			TeleportationArea->CheckShouldPortalDoorOpen();
