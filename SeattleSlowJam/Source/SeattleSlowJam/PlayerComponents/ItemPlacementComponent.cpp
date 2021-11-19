@@ -67,17 +67,9 @@ void UItemPlacementComponent::SpawnGhostItem()
 		FActorSpawnParameters ActorSpawnParams;
 		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		FRotator CarriedItemRotation = CarriedItem->GetActorRotation();
-		UE_LOG(LogTemp, Warning, TEXT("Carried Item class is %s"), *GhostItemClass->GetName());
 		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(GhostItemClass, CarriedItem->GetTransform());
 		GhostItem->ChangeCollisionResponse(ECR_Overlap);
-		//GhostItem->GetComponentsByClass(MeshComponent)
-		//GhostItem = GetWorld()->SpawnActor<APlaceableItem>(Hit.ImpactPoint, CarriedItemRotation, ActorSpawnParams);
-		//GhostItem->SetActorRotation(CarriedItemRotation);
 		GhostItem->SetActorScale3D(CarriedItem->GetActorScale3D());
-		//GhostItem->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-		//GhostItem->SetItemStaticMesh(CarriedItem->GetStaticMesh());
-		//GhostItem->GetStaticMesh()->SetRelativeScale3D(CarriedItem->GetStaticMesh()->GetRelativeScale3D());
-		//GhostItem->GetStaticMesh()->SetMaterial(0, CarriedItem->GetStaticMesh()->GetMaterial(0));
 		GhostItem->bCanBePlacedOnWall = CarriedItem->bCanBePlacedOnWall;
 		//TODO give the ghost item a transparent material;
 	}
