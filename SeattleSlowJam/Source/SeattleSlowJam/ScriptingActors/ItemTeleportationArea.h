@@ -6,6 +6,22 @@
 #include "GameFramework/Actor.h"
 #include "ItemTeleportationArea.generated.h"
 
+USTRUCT()
+struct FSpawnInstructions
+{
+	GENERATED_USTRUCT_BODY()
+
+	FVector Location;
+	TSubclassOf<class APlaceableItem> ItemToSpawn;
+	FRotator Rotation;
+
+	FSpawnInstructions()
+		: Location(FVector()), ItemToSpawn(nullptr), Rotation(FRotator()) {}
+
+	FSpawnInstructions(const FVector InLocation, const TSubclassOf<APlaceableItem>& InItemClassToSpawn, const FRotator InRotator)
+		: Location(InLocation), ItemToSpawn(InItemClassToSpawn), Rotation(InRotator) {}
+};
+
 UCLASS()
 class SEATTLESLOWJAM_API AItemTeleportationArea : public AActor
 {
@@ -42,6 +58,8 @@ private:
 	TArray<AActor*> OverlappingActors;
 
 	TArray<APlaceableItem*> ItemsToTeleport;
+
+	TArray<FSpawnInstructions> SpawnInstructions;
 
 	int32 GetNumOfPlaceableItems();
 

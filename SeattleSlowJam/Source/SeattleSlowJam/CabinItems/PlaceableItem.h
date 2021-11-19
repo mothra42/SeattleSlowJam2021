@@ -28,18 +28,15 @@ protected:
 	UPROPERTY(Category = "ItemSettings", EditAnywhere)
 	float ZMovementStepSize = 10.0f;
 
-	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadWrite)
-	FVector BasementTeleportLocation;
-
-	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadOnly)
-	class AItemTeleportationArea* TeleportationArea;
-
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
 	UPROPERTY(Category = "ItemSettings", EditAnywhere)
 	bool bCanBePlacedOnWall = false;
+
+	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadWrite)
+	FVector BasementTeleportLocation;
 
 	bool bIsCarried = false;
 
@@ -52,7 +49,7 @@ public:
 
 	void AdjustHeight(bool bIsUp);
 
-	void PrepareToTeleportToBasement();
+	void PrepareToTeleportToBasement(class ATeleportationArea* TeleportationArea);
 
 	void TeleportToBasement();
 
@@ -60,6 +57,6 @@ public:
 
 	FORCEINLINE UStaticMeshComponent* GetStaticMesh() const { return ItemMesh; }
 	FORCEINLINE void SetItemStaticMesh(UStaticMeshComponent* ItemMeshToSet) { ItemMesh->SetStaticMesh(ItemMeshToSet->GetStaticMesh()); }
-	FORCEINLINE AItemTeleportationArea* GetTeleportationArea() const { return TeleportationArea; }
+//	FORCEINLINE AItemTeleportationArea* GetTeleportationArea() const { return TeleportationArea; }
 
 };

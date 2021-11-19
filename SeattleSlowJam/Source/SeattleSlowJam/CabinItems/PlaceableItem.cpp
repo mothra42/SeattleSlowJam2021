@@ -65,22 +65,22 @@ void APlaceableItem::AdjustHeight(bool bIsUp)
 	}
 }
 
-void APlaceableItem::PrepareToTeleportToBasement()
+void APlaceableItem::PrepareToTeleportToBasement(ATeleportationArea* TeleportationArea)
 {
-	TeleportationArea->AddItemToTeleport(this);
+	//TeleportationArea->AddItemToTeleport(this);
 }
 
 void APlaceableItem::TeleportToBasement()
 {
 	SetActorLocation(BasementTeleportLocation);
-	if (TeleportationArea != nullptr)
-	{
-		TeleportationArea->CheckShouldPortalDoorOpen();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *GetName());
-	}
+	//if (TeleportationArea != nullptr)
+	//{
+	//	TeleportationArea->CheckShouldPortalDoorOpen();
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *GetName());
+	//}
 }
 
 void APlaceableItem::ChangeCollisionResponse(ECollisionResponse ResponseToSet)

@@ -13,7 +13,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/InputSettings.h"
-
+#include "ScriptingActors/ItemTeleportationArea.h"
 //////////////////////////////////////////////////////////////////////////
 // ACabinCharacter
 
@@ -295,9 +295,10 @@ void ACabinCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 void ACabinCharacter::TryTeleportItemToBasement(AActor* ActorToTeleport)
 {
 	APlaceableItem* ItemToTeleport = Cast<APlaceableItem>(ActorToTeleport) ;
-	if (ItemToTeleport != nullptr && !ItemToTeleport->bIsPreparedToTeleport && bIsMovementConstrained)
+	if (ItemToTeleport != nullptr && !ItemToTeleport->bIsPreparedToTeleport && bIsMovementConstrained && TeleportationArea != nullptr)
 	{
-		ItemToTeleport->PrepareToTeleportToBasement();
+		//ItemToTeleport->PrepareToTeleportToBasement(TeleportationArea);
+		TeleportationArea->AddItemToTeleport(ItemToTeleport);
 		ItemToTeleport->SetActorHiddenInGame(true);
 	}
 }
