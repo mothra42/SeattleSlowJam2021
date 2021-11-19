@@ -16,6 +16,8 @@ public:
 	AFireDrop();
 
 protected:
+	UPROPERTY(Category = Setup, EditDefaultsOnly, BlueprintReadOnly)
+	class USphereComponent* CollisionComponent;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

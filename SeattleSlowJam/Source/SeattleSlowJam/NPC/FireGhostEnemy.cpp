@@ -4,10 +4,21 @@
 #include "FireGhostEnemy.h"
 #include "EnemyProjectiles/FireDrop.h"
 
+void AFireGhostEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_SpawnFireDropTimer,
+		this,
+		&AFireGhostEnemy::SpawnFireDrop,
+		SpawnRate,
+		true
+	);
+}
+
 void AFireGhostEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	RunSpawnTimer();
 }
 
 void AFireGhostEnemy::SpawnFireDrop()
@@ -22,25 +33,4 @@ void AFireGhostEnemy::SpawnFireDrop()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s has no FireDropSpawnClass!"), *GetName());
 	}
-}
-
-void AFireGhostEnemy::RunSpawnTimer()
-{
-	if (bCanSpawnFireDrop)
-	{
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle_SpawnFireDropTimerExpired,
-			this,
-			&AFireGhostEnemy::SpawnTimerExpired,
-			SpawnRate
-		);
-
-		bCanSpawnFireDrop = false;
-		SpawnFireDrop();
-	}
-}
-
-void AFireGhostEnemy::SpawnTimerExpired()
-{
-	bCanSpawnFireDrop = true;
 }
