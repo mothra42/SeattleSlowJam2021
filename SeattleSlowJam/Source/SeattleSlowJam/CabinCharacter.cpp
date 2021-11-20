@@ -85,6 +85,9 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("EnterItemAdjustmentMode", IE_Released, this, &ACabinCharacter::ExitItemAdjustmentMode);
 	PlayerInputComponent->BindAxis("RotateRight", this, &ACabinCharacter::RotateItem);
 	PlayerInputComponent->BindAxis("AdjustLineTraceLength", this, &ACabinCharacter::AdjustItemLineTraceLength);
+
+	//Emergency respawn
+	PlayerInputComponent->BindAction("Respawn", IE_Pressed, this, &ACabinCharacter::HandleDeath);
 }
 
 void ACabinCharacter::BeginPlay()
@@ -184,7 +187,6 @@ void ACabinCharacter::Interact()
 	else
 	{
 		PickupItem();
-		MoveCameraOut_BP();
 	}
 }
 
@@ -209,7 +211,6 @@ void ACabinCharacter::PickupItem()
 			}
 		}
 		APlaceableItem* ItemToCarry = Cast<APlaceableItem>(ClosestActor);
-		//APlaceableItem* ItemToCarry = Cast<APlaceableItem>(Hit.Actor);
 		if (ItemToCarry != nullptr)
 		{
 			TSubclassOf<APlaceableItem> Class = ItemToCarry->GetClass();
@@ -218,6 +219,7 @@ void ACabinCharacter::PickupItem()
 			ItemToCarry->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 			ItemToCarry->SetActorHiddenInGame(true);
 			ItemPlacementComponent->SpawnGhostItem();
+			MoveCameraOut_BP();
 		}
 	}
 }
