@@ -329,7 +329,10 @@ void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 
 void ACabinCharacter::HandleDeath()
 {
-	TeleportTo(PlayerRespawnLocation, GetActorRotation());
+	if (bIsMovementConstrained)
+	{
+		TeleportTo(PlayerRespawnLocation, GetActorRotation());
+	}
 }
 
 void ACabinCharacter::SetPlayerRespawnLocation(FVector LocationToRespawnAt)
