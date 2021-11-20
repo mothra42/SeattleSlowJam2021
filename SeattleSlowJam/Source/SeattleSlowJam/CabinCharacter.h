@@ -109,6 +109,13 @@ protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "MoveCameraOut"))
+	void MoveCameraOut_BP();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "MoveCameraBack"))
+	void MoveCameraBack_BP();
+
 private:
 	bool bIsMovementConstrained = false;
 

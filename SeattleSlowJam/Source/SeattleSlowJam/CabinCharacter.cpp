@@ -179,10 +179,12 @@ void ACabinCharacter::Interact()
 	if (ItemPlacementComponent->GetCarriedItem() != nullptr)
 	{
 		PlaceItem();
+		MoveCameraBack_BP();
 	}
 	else
 	{
 		PickupItem();
+		MoveCameraOut_BP();
 	}
 }
 
