@@ -38,10 +38,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ShouldConstrainMovement(bool bShouldConstrainMovement);
 
-	void TakeDamage();
+	UFUNCTION(BlueprintCallable)
+	void HandleDeath();
 
 	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadWrite)
 	class AItemTeleportationArea* TeleportationArea;
+
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerRespawnLocation(FVector LocationToRespawnAt);
 
 protected:
 
@@ -98,6 +102,8 @@ private:
 	void RotateTimerExpired();
 
 	void TryTeleportItemToBasement(AActor* ActorToTeleport);
+
+	FVector PlayerRespawnLocation;
 
 protected:
 	// APawn interface
