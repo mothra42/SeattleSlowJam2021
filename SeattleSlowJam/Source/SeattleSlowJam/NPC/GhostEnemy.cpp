@@ -73,5 +73,5 @@ void AGhostEnemy::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 
 void AGhostEnemy::ApplyDamage(ACabinCharacter* CabinCharacter)
 {
-	CabinCharacter->TakeDamage();
+	CabinCharacter->HandleDeath();
 }
