@@ -67,6 +67,9 @@ protected:
 	void SwitchDirection();
 
 public:	
+	UPROPERTY(Category = "DamageType", EditDefaultsOnly, BlueprintReadOnly)
+	bool bAcceptYarnDamage = true;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

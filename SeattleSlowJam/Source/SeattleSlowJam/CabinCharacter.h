@@ -128,6 +128,13 @@ public:
 		bool bFromSweep, 
 		const FHitResult& SweepResult);
 
+protected:
+	//Projectiles
+	UPROPERTY(Category = "Projectile", EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class AYarnBallProjectile> YarnBallClass;
+
+	void ThrowYarnBall();
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

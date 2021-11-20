@@ -14,6 +14,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/InputSettings.h"
 #include "ScriptingActors/ItemTeleportationArea.h"
+#include "PlayerComponents/YarnBallProjectile.h"
 //////////////////////////////////////////////////////////////////////////
 // ACabinCharacter
 
@@ -88,17 +89,23 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 
 	//Emergency respawn
 	PlayerInputComponent->BindAction("Respawn", IE_Pressed, this, &ACabinCharacter::HandleDeath);
+
+	//Projectile
+	PlayerInputComponent->BindAction("FireProjectile", IE_Pressed, this, &ACabinCharacter::ThrowYarnBall);
 }
 
 void ACabinCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Set W Key mapping in case it was not reset.
+	//Set Key mapping in case it was not reset.
 	UInputSettings* Settings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
-	FKey Key = FKey(TEXT("W"));
-	Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Jump"), Key));
-	Settings->AddAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), Key));
+	FKey WKey = FKey(TEXT("W"));
+	FKey EKey = FKey(TEXT("E"));
+	Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Jump"), WKey));
+	Settings->AddAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), WKey));
+	Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), EKey));
+	Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Interact"), EKey));
 }
 
 void ACabinCharacter::AddControllerYawInput(float Value)
@@ -312,18 +319,27 @@ void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 {
 	bIsMovementConstrained = bShouldConstrainMovement;
 	UInputSettings* Settings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
-	FKey Key = FKey(TEXT("W"));
+	FKey WKey = FKey(TEXT("W"));
+	FKey EKey = FKey(TEXT("E"));
 	if (bShouldConstrainMovement)
 	{
 		//remap 'W' to Jump
-		Settings->RemoveAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), Key));
-		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Jump"), Key));
+		Settings->RemoveAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), WKey));
+		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Jump"), WKey));
+
+		//remap 'E' to Fire Projectile
+		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Interact"), EKey));
+		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), EKey));
 	}
 	else
 	{
 		//remap 'W' To MoveForward
-		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Jump"), Key));
-		Settings->AddAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), Key));
+		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Jump"), WKey));
+		Settings->AddAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), WKey));
+
+		//remap 'E' to Interact
+		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), EKey));
+		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Interact"), EKey));
 	}
 }
 
@@ -338,4 +354,25 @@ void ACabinCharacter::HandleDeath()
 void ACabinCharacter::SetPlayerRespawnLocation(FVector LocationToRespawnAt)
 {
 	PlayerRespawnLocation = LocationToRespawnAt;
+}
+
+//--------------------Attacks---------------------------------------------------------
+
+void ACabinCharacter::ThrowYarnBall()
+{
+	GetMesh()->GetRightVector();
+	FRotator FacingRotation(0, 0, 0);
+	//Spawn yarn ball projectile
+	if ((GetMesh()->GetComponentRotation().Yaw >= -90.0f && GetMesh()->GetComponentRotation().Yaw < 0))
+	{
+		FacingRotation = FRotator(0, 0, 0);
+	}
+	else
+	{
+		FacingRotation = FRotator(0, 180, 0);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Throwing yarn ball"));
+	const FVector SpawnLocation = GetActorLocation() + (GetMesh()->GetRightVector() * 50.0f);
+	UE_LOG(LogTemp, Warning, TEXT("Rotation is %s"), *GetMesh()->GetComponentRotation().ToString());
+	GetWorld()->SpawnActor<AYarnBallProjectile>(YarnBallClass, SpawnLocation, FacingRotation);
 }
