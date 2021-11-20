@@ -187,7 +187,6 @@ void ACabinCharacter::Interact()
 	else
 	{
 		PickupItem();
-		MoveCameraOut_BP();
 	}
 }
 
@@ -212,7 +211,6 @@ void ACabinCharacter::PickupItem()
 			}
 		}
 		APlaceableItem* ItemToCarry = Cast<APlaceableItem>(ClosestActor);
-		//APlaceableItem* ItemToCarry = Cast<APlaceableItem>(Hit.Actor);
 		if (ItemToCarry != nullptr)
 		{
 			TSubclassOf<APlaceableItem> Class = ItemToCarry->GetClass();
@@ -221,6 +219,7 @@ void ACabinCharacter::PickupItem()
 			ItemToCarry->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 			ItemToCarry->SetActorHiddenInGame(true);
 			ItemPlacementComponent->SpawnGhostItem();
+			MoveCameraOut_BP();
 		}
 	}
 }
