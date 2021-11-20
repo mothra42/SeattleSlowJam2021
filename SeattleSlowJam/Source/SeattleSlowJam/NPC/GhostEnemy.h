@@ -46,6 +46,8 @@ protected:
 
 	float Period;
 
+	FVector MovementDirection = FVector::RightVector;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -56,6 +58,13 @@ protected:
 	void SetPeriod();
 
 	void ApplyDamage(class ACabinCharacter* CabinCharacter);
+
+	UPROPERTY(Category = "Movement", EditAnywhere, BlueprintReadOnly)
+	float TimeTillSwitchDirection = 5.0f;
+
+	FTimerHandle TimerHandle_SwitchDirection;
+
+	void SwitchDirection();
 
 public:	
 	// Called every frame

@@ -29,6 +29,13 @@ void AGhostEnemy::BeginPlay()
 	Super::BeginPlay();
 	SetAmplitude();
 	SetPeriod();
+
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_SwitchDirection,
+		this,
+		&AGhostEnemy::SwitchDirection,
+		TimeTillSwitchDirection,
+		true);
 }
 
 // Called every frame
@@ -37,7 +44,7 @@ void AGhostEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	Cycle = CalculateSineCycle(DeltaTime);
 	SetActorLocation(GetActorLocation() + 
-		(FVector::ForwardVector * MovementSpeed) + 
+		(MovementDirection * MovementSpeed) +
 		(FVector::UpVector * Amplitude * FMath::Sin(Cycle))
 	);
 }
@@ -74,4 +81,17 @@ void AGhostEnemy::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 void AGhostEnemy::ApplyDamage(ACabinCharacter* CabinCharacter)
 {
 	CabinCharacter->HandleDeath();
+}
+
+void AGhostEnemy::SwitchDirection()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Switching direction"));
+	if (MovementDirection == FVector::RightVector)
+	{
+		MovementDirection = FVector::LeftVector;
+	}
+	else
+	{
+		MovementDirection = FVector::RightVector;
+	}
 }
