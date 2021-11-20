@@ -323,8 +323,12 @@ void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 	}
 }
 
-void ACabinCharacter::TakeDamage()
+void ACabinCharacter::HandleDeath()
 {
-	//TODO Take damage
-	UE_LOG(LogTemp, Warning, TEXT("Taking Damage"));
+	TeleportTo(PlayerRespawnLocation, GetActorRotation());
+}
+
+void ACabinCharacter::SetPlayerRespawnLocation(FVector LocationToRespawnAt)
+{
+	PlayerRespawnLocation = LocationToRespawnAt;
 }
