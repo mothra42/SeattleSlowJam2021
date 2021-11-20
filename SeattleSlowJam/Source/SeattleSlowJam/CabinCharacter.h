@@ -110,9 +110,6 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
-	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "MoveCameraOut"))
-	void MoveCameraOut_BP();
-
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "MoveCameraBack"))
 	void MoveCameraBack_BP();
 
@@ -127,6 +124,9 @@ public:
 		int32 OtherBodyIndex, 
 		bool bFromSweep, 
 		const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "MoveCameraOut"))
+	void MoveCameraOut_BP();
 
 public:
 	/** Returns CameraBoom subobject **/

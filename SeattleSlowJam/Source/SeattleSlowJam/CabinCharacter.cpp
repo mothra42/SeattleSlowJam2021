@@ -85,6 +85,9 @@ void ACabinCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("EnterItemAdjustmentMode", IE_Released, this, &ACabinCharacter::ExitItemAdjustmentMode);
 	PlayerInputComponent->BindAxis("RotateRight", this, &ACabinCharacter::RotateItem);
 	PlayerInputComponent->BindAxis("AdjustLineTraceLength", this, &ACabinCharacter::AdjustItemLineTraceLength);
+
+	//Emergency respawn
+	PlayerInputComponent->BindAction("Respawn", IE_Pressed, this, &ACabinCharacter::HandleDeath);
 }
 
 void ACabinCharacter::BeginPlay()
