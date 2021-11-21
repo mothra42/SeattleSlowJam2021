@@ -94,4 +94,5 @@ void AGhostEnemy::SwitchDirection()
 	{
 		MovementDirection = FVector::RightVector;
 	}
+	SetActorRotation(GetActorRotation() + FRotator(0, 180, 0));
 }
