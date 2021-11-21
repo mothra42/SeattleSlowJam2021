@@ -40,6 +40,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "PlayFireParticleEffect"))
+	void PlayFireParticleEffect();
+
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,
