@@ -133,6 +133,12 @@ protected:
 	UPROPERTY(Category = "Projectile", EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class AYarnBallProjectile> YarnBallClass;
 
+	UPROPERTY(Category = "Projectile", BlueprintReadWrite)
+	bool bIsThrowing = false;
+
+	UFUNCTION(BlueprintCallable)
+	void EndThrowAnimation();
+
 	void ThrowYarnBall();
 
 public:

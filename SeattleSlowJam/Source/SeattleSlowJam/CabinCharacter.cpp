@@ -102,10 +102,13 @@ void ACabinCharacter::BeginPlay()
 	UInputSettings* Settings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
 	FKey WKey = FKey(TEXT("W"));
 	FKey EKey = FKey(TEXT("E"));
+	FKey LMBKey = FKey(TEXT("LeftMouseButton"));
 	Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Jump"), WKey));
 	Settings->AddAxisMapping(FInputAxisKeyMapping(TEXT("MoveForward"), WKey));
 	Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), EKey));
 	Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Interact"), EKey));
+	Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), LMBKey));
+	Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Interact"), LMBKey));
 }
 
 void ACabinCharacter::AddControllerYawInput(float Value)
@@ -321,6 +324,7 @@ void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 	UInputSettings* Settings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
 	FKey WKey = FKey(TEXT("W"));
 	FKey EKey = FKey(TEXT("E"));
+	FKey LMBKey = FKey(TEXT("LeftMouseButton"));
 	if (bShouldConstrainMovement)
 	{
 		//remap 'W' to Jump
@@ -330,6 +334,9 @@ void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 		//remap 'E' to Fire Projectile
 		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Interact"), EKey));
 		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), EKey));
+		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("Interact"), LMBKey));
+		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), LMBKey));
+		
 	}
 	else
 	{
@@ -340,6 +347,8 @@ void ACabinCharacter::ShouldConstrainMovement(bool bShouldConstrainMovement)
 		//remap 'E' to Interact
 		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), EKey));
 		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Interact"), EKey));
+		Settings->RemoveActionMapping(FInputActionKeyMapping(TEXT("FireProjectile"), LMBKey));
+		Settings->AddActionMapping(FInputActionKeyMapping(TEXT("Interact"), LMBKey));
 	}
 }
 
@@ -360,6 +369,7 @@ void ACabinCharacter::SetPlayerRespawnLocation(FVector LocationToRespawnAt)
 
 void ACabinCharacter::ThrowYarnBall()
 {
+	bIsThrowing = true;
 	GetMesh()->GetRightVector();
 	FRotator FacingRotation(0, 0, 0);
 	//Spawn yarn ball projectile
@@ -371,8 +381,11 @@ void ACabinCharacter::ThrowYarnBall()
 	{
 		FacingRotation = FRotator(0, 180, 0);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Throwing yarn ball"));
-	const FVector SpawnLocation = GetActorLocation() + (GetMesh()->GetRightVector() * 50.0f);
-	UE_LOG(LogTemp, Warning, TEXT("Rotation is %s"), *GetMesh()->GetComponentRotation().ToString());
+	const FVector SpawnLocation = GetActorLocation() + (GetMesh()->GetRightVector() * 100.0f);
 	GetWorld()->SpawnActor<AYarnBallProjectile>(YarnBallClass, SpawnLocation, FacingRotation);
+}
+
+void ACabinCharacter::EndThrowAnimation()
+{
+	bIsThrowing = false;
 }

@@ -15,13 +15,12 @@ AYarnBallProjectile::AYarnBallProjectile()
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	RootComponent = CollisionComponent;
-	CollisionComponent->OnComponentHit.AddDynamic(this, &AYarnBallProjectile::OnHit);
+	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AYarnBallProjectile::OnBeginOverlap);
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
 	StaticMeshComp->AttachTo(RootComponent);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	//ProjectileMovement->UpdatedComponent = ProjectileMesh;
 	ProjectileMovement->MaxSpeed = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
@@ -51,12 +50,14 @@ void AYarnBallProjectile::Tick(float DeltaTime)
 
 }
 
-void AYarnBallProjectile::OnHit(UPrimitiveComponent* HitComp,
+void AYarnBallProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor,
 	UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse,
-	const FHitResult& Hit)
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Hit Actor is %s"), *OtherActor->GetName());
 	AGhostEnemy* HitGhost = Cast<AGhostEnemy>(OtherActor);
 	if (HitGhost && HitGhost->bAcceptYarnDamage)
 	{
