@@ -80,7 +80,7 @@ void AGhostEnemy::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 
 void AGhostEnemy::ApplyDamage(ACabinCharacter* CabinCharacter)
 {
-	CabinCharacter->HandleDeath();
+	//CabinCharacter->HandleDeath();
 }
 
 void AGhostEnemy::SwitchDirection()

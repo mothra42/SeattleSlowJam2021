@@ -24,6 +24,9 @@ class ACabinCharacter : public ACharacter
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
 	class USceneComponent* SphereTraceOrigin;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
+	class UBoxComponent* JumpBox;
 public:
 	ACabinCharacter();
 
@@ -126,6 +129,14 @@ public:
 		UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, 
 		bool bFromSweep, 
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnJumpBoxBeginOverlap(UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
 		const FHitResult& SweepResult);
 
 protected:
