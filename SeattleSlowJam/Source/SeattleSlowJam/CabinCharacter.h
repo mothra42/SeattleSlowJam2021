@@ -136,10 +136,17 @@ protected:
 	UPROPERTY(Category = "Projectile", BlueprintReadWrite)
 	bool bIsThrowing = false;
 
-	UFUNCTION(BlueprintCallable)
 	void EndThrowAnimation();
 
 	void ThrowYarnBall();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "PlayThowAnimationMontage"))
+	void PlayThowAnimationMontage();
+
+	FTimerHandle TimerHandle_ThrowBall;
+
+	UPROPERTY(Category = "Projectile", EditDefaultsOnly, BlueprintReadOnly)
+	float ThrowBallTimer = 0.3f;
 
 public:
 	/** Returns CameraBoom subobject **/

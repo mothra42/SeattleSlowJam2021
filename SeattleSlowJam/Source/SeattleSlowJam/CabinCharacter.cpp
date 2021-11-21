@@ -369,7 +369,21 @@ void ACabinCharacter::SetPlayerRespawnLocation(FVector LocationToRespawnAt)
 
 void ACabinCharacter::ThrowYarnBall()
 {
-	bIsThrowing = true;
+	if (!bIsThrowing)
+	{
+		PlayThowAnimationMontage();
+		bIsThrowing = true;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_ThrowBall,
+			this,
+			&ACabinCharacter::EndThrowAnimation,
+			ThrowBallTimer
+		);
+	}
+}
+
+void ACabinCharacter::EndThrowAnimation()
+{
 	GetMesh()->GetRightVector();
 	FRotator FacingRotation(0, 0, 0);
 	//Spawn yarn ball projectile
@@ -381,11 +395,7 @@ void ACabinCharacter::ThrowYarnBall()
 	{
 		FacingRotation = FRotator(0, 180, 0);
 	}
-	const FVector SpawnLocation = GetActorLocation() + (GetMesh()->GetRightVector() * 100.0f);
+	const FVector SpawnLocation = GetActorLocation() + (GetMesh()->GetRightVector() * 75.0f);
 	GetWorld()->SpawnActor<AYarnBallProjectile>(YarnBallClass, SpawnLocation, FacingRotation);
-}
-
-void ACabinCharacter::EndThrowAnimation()
-{
 	bIsThrowing = false;
 }
