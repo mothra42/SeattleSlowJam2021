@@ -61,4 +61,5 @@ private:
 public:
 	FORCEINLINE void SetCarriedItem(APlaceableItem* ItemToCarry) { CarriedItem = ItemToCarry; }
 	FORCEINLINE APlaceableItem* GetCarriedItem() const { return CarriedItem; }
+	FORCEINLINE APlaceableItem* GetGhostItem() const { return GhostItem; }
 };

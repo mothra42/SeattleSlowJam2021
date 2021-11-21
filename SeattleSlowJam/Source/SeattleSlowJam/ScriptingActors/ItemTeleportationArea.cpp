@@ -49,12 +49,10 @@ bool AItemTeleportationArea::CheckShouldPortalDoorOpen()
 	if (GetNumOfPlaceableItems() <= 0)
 	{
 		bShouldPortalDoorBeOpen = true;
-		UE_LOG(LogTemp, Warning, TEXT("Portal door is open"));
 	}
 	else
 	{
 		bShouldPortalDoorBeOpen = false;
-		UE_LOG(LogTemp, Warning, TEXT("Portal door is closed"));
 	}
 
 	return bShouldPortalDoorBeOpen;

@@ -195,7 +195,7 @@ void ACabinCharacter::MoveRight(float Value)
 
 void ACabinCharacter::Interact()
 {
-	if (ItemPlacementComponent->GetCarriedItem() != nullptr)
+	if (ItemPlacementComponent->GetCarriedItem() != nullptr && ItemPlacementComponent->GetGhostItem() != nullptr)
 	{
 		PlaceItem();
 		MoveCameraBack_BP();
@@ -230,7 +230,6 @@ void ACabinCharacter::PickupItem()
 		if (ItemToCarry != nullptr)
 		{
 			TSubclassOf<APlaceableItem> Class = ItemToCarry->GetClass();
-			UE_LOG(LogTemp, Warning, TEXT("Carried Item from character class is %s"), *Class->GetName());
 			ItemPlacementComponent->SetCarriedItem(ItemToCarry);
 			ItemToCarry->GetStaticMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 			ItemToCarry->SetActorHiddenInGame(true);

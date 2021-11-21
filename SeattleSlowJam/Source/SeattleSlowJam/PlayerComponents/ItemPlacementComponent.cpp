@@ -35,7 +35,7 @@ void UItemPlacementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	ACabinCharacter* Owner = Cast<ACabinCharacter>(GetOwner());
-	if (CarriedItem != nullptr && Owner != nullptr && !Owner->GetItemModeState())
+	if (CarriedItem != nullptr && Owner != nullptr && !Owner->GetItemModeState() && GhostItem != nullptr)
 	{
 		UpdateGhostItemLocation();
 	}
@@ -83,7 +83,7 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 	{
 		GhostItem->SetActorLocation(Hit.Location);
 	}
-	else
+	else if(GhostItem != nullptr)
 	{
 		//TODO Apply a color that makes it clear it's an invalid placement.
 		ACabinCharacter* PlayerCharacter = Cast<ACabinCharacter>(GetOwner());
@@ -101,31 +101,34 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 
 void UItemPlacementComponent::FinishPlacingItem()
 {
-	TArray<AActor*> OverlappedActors;
-	TArray<AActor*> OverlappedPlaceableItems;
-	GhostItem->GetOverlappingActors(OverlappedActors);
-	TSubclassOf<APlaceableItem> PlaceableItemClass;
-	GhostItem->GetOverlappingActors(OverlappedPlaceableItems, PlaceableItemClass);
-	if (bAreOverlappedActorsValid())
-	{
-		FVector NewLocation = GhostItem->GetActorLocation();
-		FRotator NewRotation = GhostItem->GetActorRotation();
-		GhostItem->Destroy();
-		GhostItem = nullptr;
-		CarriedItem->SetActorLocationAndRotation(NewLocation, NewRotation);
-		CarriedItem->SetActorHiddenInGame(false);
-		CarriedItem->ChangeCollisionResponse(ECR_Block);
-		AItemTeleportationArea* TeleportationArea = Cast<ACabinCharacter>(GetOwner())->TeleportationArea;
-		if (TeleportationArea != nullptr)
+	//if (GhostItem != nullptr)
+	//{
+		//TArray<AActor*> OverlappedActors;
+		//TArray<AActor*> OverlappedPlaceableItems;
+		//GhostItem->GetOverlappingActors(OverlappedActors);
+		//TSubclassOf<APlaceableItem> PlaceableItemClass;
+		//GhostItem->GetOverlappingActors(OverlappedPlaceableItems, PlaceableItemClass);
+		if (bAreOverlappedActorsValid())
 		{
-			TeleportationArea->CheckShouldPortalDoorOpen();
+			FVector NewLocation = GhostItem->GetActorLocation();
+			FRotator NewRotation = GhostItem->GetActorRotation();
+			GhostItem->Destroy();
+			GhostItem = nullptr;
+			CarriedItem->SetActorLocationAndRotation(NewLocation, NewRotation);
+			CarriedItem->SetActorHiddenInGame(false);
+			CarriedItem->ChangeCollisionResponse(ECR_Block);
+			AItemTeleportationArea* TeleportationArea = Cast<ACabinCharacter>(GetOwner())->TeleportationArea;
+			if (TeleportationArea != nullptr)
+			{
+				TeleportationArea->CheckShouldPortalDoorOpen();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *CarriedItem->GetName());
+			}
+			CarriedItem = nullptr;
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *CarriedItem->GetName());
-		}
-		CarriedItem = nullptr;
-	}
+	//}
 }
 
 void UItemPlacementComponent::RotateItem(bool bIsRightRotation)
@@ -165,11 +168,15 @@ void UItemPlacementComponent::MoveItemUp(float Value)
 
 bool UItemPlacementComponent::bAreOverlappedActorsValid()
 {
-	TArray<AActor*> OverlappedActors;
-	TArray<AActor*> OverlappedPlaceableItems;
-	GhostItem->GetOverlappingActors(OverlappedActors);
-	TSubclassOf<APlaceableItem> PlaceableItemClass;
-	GhostItem->GetOverlappingActors(OverlappedPlaceableItems, PlaceableItemClass);
-
-	return (OverlappedActors.Num() == OverlappedPlaceableItems.Num() || OverlappedActors.Num() <= 0);
+	//if (GhostItem != nullptr)
+	//{
+	//	TArray<AActor*> OverlappedActors;
+	//	TArray<AActor*> OverlappedPlaceableItems;
+	//	GhostItem->GetOverlappingActors(OverlappedActors);
+	//	TSubclassOf<APlaceableItem> PlaceableItemClass;
+	//	GhostItem->GetOverlappingActors(OverlappedPlaceableItems, PlaceableItemClass);
+	//
+	//	return (OverlappedActors.Num() == OverlappedPlaceableItems.Num() || OverlappedActors.Num() <= 0);
+	//}
+	return true;
 }
