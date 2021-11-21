@@ -4,6 +4,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
@@ -15,6 +16,8 @@
 #include "GameFramework/InputSettings.h"
 #include "ScriptingActors/ItemTeleportationArea.h"
 #include "PlayerComponents/YarnBallProjectile.h"
+#include "NPC/FireGhostEnemy.h"
+#include "NPC/GhostEnemy.h"
 //////////////////////////////////////////////////////////////////////////
 // ACabinCharacter
 
@@ -55,6 +58,9 @@ ACabinCharacter::ACabinCharacter()
 	SphereTraceOrigin->SetupAttachment(RootComponent);
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	JumpBox = CreateDefaultSubobject<UBoxComponent>(TEXT("JumpBox"));
+	JumpBox->SetupAttachment(RootComponent);
+	JumpBox->OnComponentBeginOverlap.AddDynamic(this, &ACabinCharacter::OnJumpBoxBeginOverlap);
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ACabinCharacter::OnBeginOverlap);
 }
@@ -304,6 +310,13 @@ void ACabinCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 	const FHitResult& SweepResult)
 {
 	TryTeleportItemToBasement(OtherActor);
+	AFireGhostEnemy* FireGhost = Cast<AFireGhostEnemy>(OtherActor);
+	AGhostEnemy* Ghost = Cast<AGhostEnemy>(OtherActor);
+	if (FireGhost != nullptr || Ghost != nullptr)
+	{
+		HandleDeath();
+	}
+	
 }
 
 void ACabinCharacter::TryTeleportItemToBasement(AActor* ActorToTeleport)
@@ -369,7 +382,21 @@ void ACabinCharacter::SetPlayerRespawnLocation(FVector LocationToRespawnAt)
 
 void ACabinCharacter::ThrowYarnBall()
 {
-	bIsThrowing = true;
+	if (!bIsThrowing)
+	{
+		PlayThowAnimationMontage();
+		bIsThrowing = true;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_ThrowBall,
+			this,
+			&ACabinCharacter::EndThrowAnimation,
+			ThrowBallTimer
+		);
+	}
+}
+
+void ACabinCharacter::EndThrowAnimation()
+{
 	GetMesh()->GetRightVector();
 	FRotator FacingRotation(0, 0, 0);
 	//Spawn yarn ball projectile
@@ -381,11 +408,28 @@ void ACabinCharacter::ThrowYarnBall()
 	{
 		FacingRotation = FRotator(0, 180, 0);
 	}
-	const FVector SpawnLocation = GetActorLocation() + (GetMesh()->GetRightVector() * 100.0f);
+	const FVector SpawnLocation = GetActorLocation() + (GetMesh()->GetRightVector() * 75.0f);
 	GetWorld()->SpawnActor<AYarnBallProjectile>(YarnBallClass, SpawnLocation, FacingRotation);
+	bIsThrowing = false;
 }
 
-void ACabinCharacter::EndThrowAnimation()
+void ACabinCharacter::OnJumpBoxBeginOverlap(UPrimitiveComponent* OverlappedComp,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
 {
-	bIsThrowing = false;
+	
+	AFireGhostEnemy* FireGhost = Cast<AFireGhostEnemy>(OtherActor);
+	AGhostEnemy* Ghost = Cast<AGhostEnemy>(OtherActor);
+	if (FireGhost != nullptr)
+	{
+		FireGhost->Destroy();
+	}
+	else if (Ghost != nullptr)
+	{
+		FVector ForceDirection = (-Ghost->GetActorLocation() + GetActorLocation()).GetSafeNormal();
+		GetCharacterMovement()->AddImpulse(ForceDirection * 100000.0f);
+	}
 }

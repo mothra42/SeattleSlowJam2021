@@ -24,6 +24,9 @@ class ACabinCharacter : public ACharacter
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ItemInteraction, meta = (AllowPrivateAccess = "true"))
 	class USceneComponent* SphereTraceOrigin;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
+	class UBoxComponent* JumpBox;
 public:
 	ACabinCharacter();
 
@@ -128,6 +131,14 @@ public:
 		bool bFromSweep, 
 		const FHitResult& SweepResult);
 
+	UFUNCTION()
+	void OnJumpBoxBeginOverlap(UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
 protected:
 	//Projectiles
 	UPROPERTY(Category = "Projectile", EditDefaultsOnly, BlueprintReadOnly)
@@ -136,10 +147,17 @@ protected:
 	UPROPERTY(Category = "Projectile", BlueprintReadWrite)
 	bool bIsThrowing = false;
 
-	UFUNCTION(BlueprintCallable)
 	void EndThrowAnimation();
 
 	void ThrowYarnBall();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "PlayThowAnimationMontage"))
+	void PlayThowAnimationMontage();
+
+	FTimerHandle TimerHandle_ThrowBall;
+
+	UPROPERTY(Category = "Projectile", EditDefaultsOnly, BlueprintReadOnly)
+	float ThrowBallTimer = 0.3f;
 
 public:
 	/** Returns CameraBoom subobject **/

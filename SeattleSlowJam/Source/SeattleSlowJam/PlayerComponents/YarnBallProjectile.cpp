@@ -34,7 +34,7 @@ void AYarnBallProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ProjectileMovement->Velocity = GetActorRightVector() * 300.0f;
+	ProjectileMovement->Velocity = GetActorRightVector() * 700.0f;
 
 	//Destroy actor at the end of life time
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_LifeTime,
@@ -65,7 +65,7 @@ void AYarnBallProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComp,
 	}
 	else
 	{
-		//Add fire particle effect and destroy
+		PlayFireParticleEffect();
 	}
 
 	Destroy();
