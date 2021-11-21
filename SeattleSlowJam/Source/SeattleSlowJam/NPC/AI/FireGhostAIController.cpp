@@ -4,6 +4,7 @@
 #include "FireGhostAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "../FireGhostEnemy.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void AFireGhostAIController::BeginPlay()
 {
@@ -55,8 +56,14 @@ void AFireGhostAIController::PursuePlayer()
 {
 	if (bShouldPursuePlayer)
 	{
+		
 		AActor* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+		FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(
+			GetPawn()->GetActorLocation(), 
+			Player->GetActorLocation()
+		);
 		MoveToActor(Player);
+		GetPawn()->SetActorRotation(FRotator(0, NewRotation.Yaw - 90, 0) );
 	}
 }
 
