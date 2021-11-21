@@ -66,4 +66,7 @@ private:
 public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool GetShouldPortalDoorBeOpen() { return bShouldPortalDoorBeOpen; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetPortalDoorClosed();
 };

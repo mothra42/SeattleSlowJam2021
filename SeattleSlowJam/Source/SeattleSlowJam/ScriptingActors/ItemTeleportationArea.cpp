@@ -83,3 +83,8 @@ void AItemTeleportationArea::ClearItemsToTeleport()
 {
 	SpawnInstructions.Empty();
 }
+
+void AItemTeleportationArea::SetPortalDoorClosed()
+{
+	bShouldPortalDoorBeOpen = false;
+}
