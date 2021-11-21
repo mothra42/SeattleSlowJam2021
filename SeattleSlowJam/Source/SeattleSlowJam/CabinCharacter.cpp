@@ -243,12 +243,10 @@ void ACabinCharacter::PickupItem()
 bool ACabinCharacter::SweepForPlaceableItem(TArray<FHitResult>& Hits)
 {
 	FVector TraceBegin = SphereTraceOrigin->GetComponentLocation();
-	FVector TraceEnd = SphereTraceOrigin->GetComponentLocation() + FVector::DownVector * 0.01f;
+	FVector TraceEnd = SphereTraceOrigin->GetComponentLocation() + FVector::DownVector * 50.0f;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = { EObjectTypeQuery::ObjectTypeQuery7 };
 	return UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), TraceBegin, TraceEnd,
 		75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hits, true);
-	//return UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), TraceBegin, TraceEnd,
-	//	75.0f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
 }
 
 void ACabinCharacter::PlaceItem()
