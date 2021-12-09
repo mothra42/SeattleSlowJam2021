@@ -77,11 +77,19 @@ void UItemPlacementComponent::SpawnGhostItem()
 
 void UItemPlacementComponent::UpdateGhostItemLocation()
 {
+	//TODO: New method for making collision work. Use bounding box extent
+	//Look at the normal of the HitResult and add accordingly. Will still be tricky in corners.
+	
 	FHitResult Hit;
 	//LineTraceLength = DefaultLineTraceLength;
 	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
 	{
-		GhostItem->SetActorLocation(Hit.Location);
+		UStaticMeshComponent* MeshComp = GhostItem->GetStaticMesh();
+		FBox BoundingBox = MeshComp->GetStaticMesh()->GetBoundingBox();
+		FVector Extent = BoundingBox.GetExtent();
+		DrawDebugBox(GetWorld(), Hit.Location, Extent, FColor::Red, false, 5.0f);
+		FVector AdjustedLocation = Hit.Location + (Extent * Hit.Normal);
+		GhostItem->SetActorLocation(AdjustedLocation);
 	}
 	else if(GhostItem != nullptr)
 	{
