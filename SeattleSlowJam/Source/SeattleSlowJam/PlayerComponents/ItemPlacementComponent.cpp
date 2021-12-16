@@ -70,7 +70,8 @@ void UItemPlacementComponent::SpawnGhostItem()
 		GhostItem = GetWorld()->SpawnActor<APlaceableItem>(GhostItemClass, CarriedItem->GetTransform());
 		GhostItem->ChangeCollisionResponse(ECR_Overlap);
 		GhostItem->SetActorScale3D(CarriedItem->GetActorScale3D());
-		GhostItem->bCanBePlacedOnWall = CarriedItem->bCanBePlacedOnWall;
+		GhostItem->bCanAdjustZValue = CarriedItem->bCanAdjustZValue;
+		
 		//TODO give the ghost item a transparent material;
 	}
 }
@@ -84,12 +85,17 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 	//LineTraceLength = DefaultLineTraceLength;
 	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
 	{
-		UStaticMeshComponent* MeshComp = GhostItem->GetStaticMesh();
-		FBox BoundingBox = MeshComp->GetStaticMesh()->GetBoundingBox();
-		FVector Extent = BoundingBox.GetExtent();
-		DrawDebugBox(GetWorld(), Hit.Location, Extent, FColor::Red, false, 5.0f);
-		FVector AdjustedLocation = Hit.Location + (Extent * Hit.Normal);
-		GhostItem->SetActorLocation(AdjustedLocation);
+		//GhostItem->SetActorLocation(Hit.Location, true);
+		FVector GhostItemOrigin;
+		FVector GhostItemExtent;
+		GhostItem->GetActorBounds(false, GhostItemOrigin, GhostItemExtent);
+		DrawDebugBox(GetWorld(), Hit.Location, GhostItemExtent, FColor::Red, false, 5.0f);
+		if (!GhostItem->bCanAdjustZValue)
+		{
+			Hit.Location = FVector(Hit.Location.X, Hit.Location.Y, GhostItem->GetActorLocation().Z);
+		}
+		FVector AdjustedLocation = Hit.Location + (GhostItemExtent * FVector(1.01, 1.01, 0) *Hit.Normal);
+		GhostItem->SetActorLocation(AdjustedLocation, true);
 	}
 	else if(GhostItem != nullptr)
 	{
@@ -97,6 +103,7 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 		ACabinCharacter* PlayerCharacter = Cast<ACabinCharacter>(GetOwner());
 		FVector StartLocation = PlayerCharacter->GetFollowCamera()->GetComponentLocation();
 		FVector EndLocation = StartLocation + PlayerCharacter->GetFollowCamera()->GetForwardVector() * LineTraceLength;
+		EndLocation = FVector(EndLocation.X, EndLocation.Y, GhostItem->GetActorLocation().Z);
 		GhostItem->SetActorLocation(EndLocation);
 	}
 

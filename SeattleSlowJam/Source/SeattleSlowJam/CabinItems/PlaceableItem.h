@@ -33,7 +33,7 @@ protected:
 
 public:	
 	UPROPERTY(Category = "ItemSettings", EditAnywhere)
-	bool bCanBePlacedOnWall = false;
+	bool bCanAdjustZValue = false;
 
 	UPROPERTY(Category = "TeleportSettings", EditAnywhere, BlueprintReadWrite)
 	FVector BasementTeleportLocation;

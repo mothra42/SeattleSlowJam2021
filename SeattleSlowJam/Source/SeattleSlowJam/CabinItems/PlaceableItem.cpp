@@ -50,7 +50,7 @@ void APlaceableItem::RotateRight(bool bIsRightRotation)
 
 void APlaceableItem::AdjustHeight(bool bIsUp)
 {
-	if (bCanBePlacedOnWall)
+	if (bCanAdjustZValue)
 	{
 		FVector NewLocation;
 		if (bIsUp)
