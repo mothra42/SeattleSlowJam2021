@@ -294,7 +294,6 @@ void ACabinCharacter::AdjustItemLineTraceLength(float Value)
 	}
 	else if (Value != 0.0f && bIsItemAdjustmentMode)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Working"));
 		ItemPlacementComponent->MoveItemUp(Value);
 	}
 }
