@@ -43,7 +43,6 @@ void AGhostEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	Cycle = CalculateSineCycle(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("Delta time is %f"), DeltaTime * MovementSpeed);
 	SetActorLocation(GetActorLocation() + 
 		(MovementDirection * MovementSpeed * DeltaTime) +
 		(FVector::UpVector * Amplitude * FMath::Sin(Cycle))
