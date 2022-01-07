@@ -55,6 +55,16 @@ bool UItemPlacementComponent::FindGhostItemPlacementLocation(FHitResult& Hit)
 		ObjectParams);
 }
 
+float UItemPlacementComponent::CalcPlayerItemHeightDiff()
+{
+	return GetOwner()->GetActorLocation().Z - CarriedItem->GetActorLocation().Z;
+}
+
+float UItemPlacementComponent::GetAdjustedItemZHeight()
+{
+	return GetOwner()->GetActorLocation().Z - PlayerItemHeightDiff;
+}
+
 //This method should only be called when the player first picks up and item;
 void UItemPlacementComponent::SpawnGhostItem()
 {
@@ -71,7 +81,7 @@ void UItemPlacementComponent::SpawnGhostItem()
 		GhostItem->ChangeCollisionResponse(ECR_Overlap);
 		GhostItem->SetActorScale3D(CarriedItem->GetActorScale3D());
 		GhostItem->bCanAdjustZValue = CarriedItem->bCanAdjustZValue;
-		
+		PlayerItemHeightDiff = CalcPlayerItemHeightDiff();
 		//TODO give the ghost item a transparent material;
 	}
 }
@@ -82,15 +92,17 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 	//LineTraceLength = DefaultLineTraceLength;
 	if (FindGhostItemPlacementLocation(Hit) && GhostItem != nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit Actor is %s"), *Hit.Actor->GetName());
 		FVector GhostItemOrigin;
 		FVector GhostItemExtent;
 		GhostItem->GetActorBounds(false, GhostItemOrigin, GhostItemExtent);
 		if (!GhostItem->bCanAdjustZValue)
 		{
-			Hit.Location = FVector(Hit.Location.X, Hit.Location.Y, GhostItem->GetActorLocation().Z);
+			Hit.Location = FVector(Hit.Location.X, Hit.Location.Y, GetAdjustedItemZHeight());
 		}
 		FVector AdjustedLocation = Hit.Location + (GhostItemExtent * FVector(1.01, 1.01, 0) *Hit.Normal);
 		GhostItem->SetActorLocation(AdjustedLocation, true);
+		UE_LOG(LogTemp, Warning, TEXT("Ghost Item is at %s"), *GhostItem->GetActorLocation().ToString());
 	}
 	else if(GhostItem != nullptr)
 	{
@@ -98,14 +110,14 @@ void UItemPlacementComponent::UpdateGhostItemLocation()
 		ACabinCharacter* PlayerCharacter = Cast<ACabinCharacter>(GetOwner());
 		FVector StartLocation = PlayerCharacter->GetFollowCamera()->GetComponentLocation();
 		FVector EndLocation = StartLocation + PlayerCharacter->GetFollowCamera()->GetForwardVector() * LineTraceLength;
-		EndLocation = FVector(EndLocation.X, EndLocation.Y, GhostItem->GetActorLocation().Z);
+		EndLocation = FVector(EndLocation.X, EndLocation.Y, GetAdjustedItemZHeight());
 		GhostItem->SetActorLocation(EndLocation);
 	}
 
 	if (!bAreOverlappedActorsValid())
 	{
 		//make object red showing its unplaceable
-		UE_LOG(LogTemp, Warning, TEXT("Overlapping actors"));
+		//UE_LOG(LogTemp, Warning, TEXT("Overlapping actors"));
 	}
 }
 
@@ -134,7 +146,7 @@ void UItemPlacementComponent::FinishPlacingItem()
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *CarriedItem->GetName());
+				//UE_LOG(LogTemp, Warning, TEXT("PlaceableItem %s, has no set teleportation area!"), *CarriedItem->GetName());
 			}
 			CarriedItem = nullptr;
 		}
